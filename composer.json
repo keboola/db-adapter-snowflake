@@ -14,13 +14,13 @@
     },
     "autoload": {
         "psr-4": {
-            "MyComponent\\": "src/"
+            "Keboola\\SnowflakeDbAdapter\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "MyComponent\\Tests\\": "tests/phpunit/",
-            "MyComponent\\FunctionalTests\\": "tests/functional/"
+            "Keboola\\SnowflakeDbAdapter\\Tests\\": "tests/phpunit/",
+            "Keboola\\SnowflakeDbAdapter\\FunctionalTests\\": "tests/functional/"
         }
     },
     "scripts": {
