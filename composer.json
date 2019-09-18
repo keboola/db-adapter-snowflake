@@ -1,7 +1,7 @@
 {
     "require": {
         "php": "^7.1",
-        "keboola/php-component": "^7.0.1"
+        "ext-odbc": "*"
     },
     "require-dev": {
         "jakub-onderka/php-parallel-lint": "^1.0",
@@ -25,10 +25,8 @@
     },
     "scripts": {
         "tests-phpunit": "phpunit",
-        "tests-datadir": "phpunit tests/functional",
         "tests": [
-            "@tests-phpunit",
-            "@tests-datadir"
+            "@tests-phpunit"
         ],
 
         "phpstan": "phpstan analyse ./src ./tests --level=max --no-progress -c phpstan.neon",
