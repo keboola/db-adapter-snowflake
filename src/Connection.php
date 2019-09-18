@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Keboola\Db\Import\Snowflake;
+namespace Keboola\SnowflakeDbAdapter;
 
-use Keboola\Db\Import\Exception;
+use Keboola\SnowflakeDbAdapter\Exception\BaseException;
 
 class Connection
 {
@@ -43,7 +43,7 @@ class Connection
 
         $missingOptions = array_diff($requiredOptions, array_keys($options));
         if (!empty($missingOptions)) {
-            throw new Exception('Missing options: ' . implode(', ', $missingOptions));
+            throw new BaseException('Missing options: ' . implode(', ', $missingOptions));
         }
 
         $port = isset($options['port']) ? (int) $options['port'] : 443;
@@ -86,10 +86,18 @@ class Connection
                 if (stristr($e->getMessage(), 'S1000') !== false) {
                     $attemptNumber++;
                     if ($attemptNumber > $maxBackoffAttempts) {
-                        throw new Exception('Initializing Snowflake connection failed: ' . $e->getMessage(), 0, $e);
+                        throw new BaseException(
+                            'Initializing Snowflake connection failed: ' . $e->getMessage(),
+                            0,
+                            $e
+                        );
                     }
                 } else {
-                    throw new Exception('Initializing Snowflake connection failed: ' . $e->getMessage(), 0, $e);
+                    throw new BaseException(
+                        'Initializing Snowflake connection failed: ' . $e->getMessage(),
+                        0,
+                        $e
+                    );
                 }
             }
         } while ($this->connection === null);
@@ -111,10 +119,6 @@ class Connection
      *  - name
      *  - bytes
      *  - rows
-     * @param string $schemaName
-     * @param string $tableName
-     * @return array
-     * @throws Exception
      */
     public function describeTable(string $schemaName, string $tableName): array
     {
@@ -130,7 +134,7 @@ class Connection
             }
         }
 
-        throw new Exception("Table $tableName not found in schema $schemaName");
+        throw new BaseException("Table $tableName not found in schema $schemaName");
     }
 
     public function describeTableColumns(string $schemaName, string $tableName): array
@@ -174,22 +178,22 @@ class Connection
             odbc_execute($stmt, $this->repairBinding($bind));
             odbc_free_result($stmt);
         } catch (\Throwable $e) {
-            throw (new ExceptionHandler())->createException($e);
+            (new ExceptionHandler())->handleException($e, $sql);
         }
     }
 
     public function fetchAll(string $sql, array $bind = []): array
     {
+        $rows = [];
         try {
             $stmt = odbc_prepare($this->connection, $sql);
             odbc_execute($stmt, $this->repairBinding($bind));
-            $rows = [];
             while ($row = odbc_fetch_array($stmt)) {
                 $rows[] = $row;
             }
             odbc_free_result($stmt);
         } catch (\Throwable $e) {
-            throw (new ExceptionHandler())->createException($e);
+            (new ExceptionHandler())->handleException($e, $sql);
         }
         return $rows;
     }
@@ -204,7 +208,7 @@ class Connection
             }
             odbc_free_result($stmt);
         } catch (\Throwable $e) {
-            throw (new ExceptionHandler())->createException($e);
+            (new ExceptionHandler())->handleException($e, $sql);
         }
     }
 
