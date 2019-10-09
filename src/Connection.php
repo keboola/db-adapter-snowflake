@@ -266,23 +266,11 @@ class Connection
         }
 
         $this->query(
-            vsprintf(
-                'ALTER USER IF EXISTS
-            %s
-            SET 
-            ' . Connection::createQuotedOptionsStringFromArray($options),
-                [
-                    Connection::quoteIdentifier($userName),
-                ]
-            )
+            $this->queryBuilder->alterUser($userName, $options)
         );
     }
 
-    /**
-     * @param array $otherOptions
-     * @return string
-     */
-    private static function createQuotedOptionsStringFromArray(array $otherOptions): string
+    public static function createQuotedOptionsStringFromArray(array $otherOptions): string
     {
         $otherOptionsString = '';
         foreach ($otherOptions as $option => $optionValue) {
@@ -295,42 +283,21 @@ class Connection
     public function createRole(string $roleName): void
     {
         $this->query(
-            vsprintf(
-                'CREATE ROLE IF NOT EXISTS %s',
-                [
-                    Connection::quoteIdentifier($roleName),
-                ]
-            )
+            $this->queryBuilder->createRole($roleName)
         );
     }
 
     public function createSchema(string $schema): void
     {
         $this->query(
-            vsprintf(
-                'CREATE SCHEMA IF NOT EXISTS %s',
-                [
-                    Connection::quoteIdentifier($schema),
-                ]
-            )
+            $this->queryBuilder->createSchema($schema)
         );
     }
 
     public function createUser(string $userName, string $password, array $otherOptions): void
     {
-        $otherOptionsString = Connection::createQuotedOptionsStringFromArray($otherOptions);
-
         $this->query(
-            vsprintf(
-                'CREATE USER IF NOT EXISTS
-            %s
-            PASSWORD = %s
-            ' . $otherOptionsString,
-                [
-                    Connection::quoteIdentifier($userName),
-                    Connection::quote($password),
-                ]
-            )
+            $this->queryBuilder->createUser($userName, $password, $otherOptions)
         );
     }
 
@@ -340,12 +307,7 @@ class Connection
     public function describeUser(string $userName): array
     {
         $userFields = $this->fetchAll(
-            vsprintf(
-                'DESCRIBE USER %s',
-                [
-                    Connection::quoteIdentifier($userName),
-                ]
-            )
+            $this->queryBuilder->describeUser($userName)
         );
         $result = [];
         foreach ($userFields as $userField) {
@@ -356,30 +318,15 @@ class Connection
 
     public function fetchRoles(?string $roleLike = null): array
     {
-        $sql = 'SHOW ROLES';
-        $args = [];
-        if ($roleLike !== null) {
-            $sql .= ' LIKE %s';
-            $args[] = Connection::quote($roleLike);
-        }
-
         return $this->fetchAll(
-            vsprintf(
-                $sql,
-                $args
-            )
+            $this->queryBuilder->showRoles($roleLike)
         );
     }
 
     public function fetchSchemasLike(string $schemaName): array
     {
         return $this->fetchAll(
-            vsprintf(
-                'SHOW SCHEMAS LIKE %s',
-                [
-                    Connection::quote($schemaName),
-                ]
-            )
+            $this->queryBuilder->showSchemas($schemaName)
         );
     }
 
@@ -419,13 +366,7 @@ class Connection
     private function grantRoleToObject(string $role, string $granteeName, string $objectType): void
     {
         $this->query(
-            vsprintf(
-                'GRANT ROLE %s TO ' . $objectType . ' %s',
-                [
-                    Connection::quoteIdentifier($role),
-                    Connection::quoteIdentifier($granteeName),
-                ]
-            )
+            $this->queryBuilder->grantRoleToObjectType($role, $granteeName, $objectType)
         );
     }
 
@@ -442,13 +383,7 @@ class Connection
     public function grantSelectOnAllTablesInSchemaToRole(string $schemaName, string $role): void
     {
         $this->query(
-            vsprintf(
-                'GRANT SELECT ON ALL TABLES IN SCHEMA %s TO ROLE %s',
-                [
-                    Connection::quoteIdentifier($schemaName),
-                    Connection::quoteIdentifier($role),
-                ]
-            )
+            $this->queryBuilder->grantSelectOnAllTablesInSchemaToRole($schemaName, $role)
         );
     }
 
@@ -460,14 +395,12 @@ class Connection
         array $grant
     ): void {
         $this->query(
-            vsprintf(
-                'GRANT ' . implode(',', $grant) . '
-            ON ' . $grantOnObjectType . ' %s
-            TO ' . $granteeObjectType . ' %s',
-                [
-                    Connection::quoteIdentifier($grantOnName),
-                    Connection::quoteIdentifier($grantToName),
-                ]
+            $this->queryBuilder->grantToObjectTypeOnObjectType(
+                $grantOnObjectType,
+                $grantOnName,
+                $granteeObjectType,
+                $grantToName,
+                $grant
             )
         );
     }
@@ -480,15 +413,12 @@ class Connection
         array $grant
     ): void {
         $this->query(
-            vsprintf(
-                'GRANT ' . implode(',', $grant) . '
-            ON ALL ' . $grantOnObjectType . 'S
-            IN SCHEMA %s
-            TO ' . $granteeObjectType . ' %s',
-                [
-                    Connection::quoteIdentifier($schemaName),
-                    Connection::quoteIdentifier($grantToName),
-                ]
+            $this->queryBuilder->grantToObjectTypeOnAllObjectTypesInSchema(
+                $grantOnObjectType,
+                $schemaName,
+                $granteeObjectType,
+                $grantToName,
+                $grant
             )
         );
     }
@@ -520,14 +450,7 @@ class Connection
         string $objectTypeGrantedTo
     ): void {
         $this->query(
-            vsprintf(
-                'REVOKE ROLE %s
-            FROM ' . $objectTypeGrantedTo . ' %s',
-                [
-                    Connection::quoteIdentifier($grantedRole),
-                    Connection::quoteIdentifier($roleGrantedTo),
-                ]
-            )
+            $this->queryBuilder->revokeRoleFromObjectType($grantedRole, $roleGrantedTo, $objectTypeGrantedTo)
         );
     }
 
@@ -542,12 +465,7 @@ class Connection
     public function showGrantsOfRole(string $role): array
     {
         return $this->fetchAll(
-            vsprintf(
-                'SHOW GRANTS OF ROLE %s',
-                [
-                    Connection::quoteIdentifier($role),
-                ]
-            )
+            $this->queryBuilder->showGrantsOfRole($role)
         );
     }
 
@@ -557,18 +475,13 @@ class Connection
     public function showGrantsToRole(string $role): array
     {
         return $this->fetchAll(
-            vsprintf(
-                'SHOW GRANTS TO ROLE %s',
-                [
-                    Connection::quoteIdentifier($role),
-                ]
-            )
+            $this->queryBuilder->showGrantsToRole($role)
         );
     }
 
     public function getCurrentRole(): string
     {
-        $res = $this->fetchAll('SELECT CURRENT_ROLE() AS "name"');
+        $res = $this->fetchAll($this->queryBuilder->currentRole());
         return $res[0]['name'];
     }
 }
