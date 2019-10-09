@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Keboola\SnowflakeDbAdapter\Tests;
 
 use Keboola\SnowflakeDbAdapter\Connection;
+use Keboola\SnowflakeDbAdapter\Connection\Expr;
 use Keboola\SnowflakeDbAdapter\QueryBuilder;
 use PHPUnit\Framework\TestCase;
 
@@ -87,6 +88,7 @@ class QueryBuilderTest extends TestCase
 Y='options'
 Z='that\\\"need'
 Q='esc\\'aping'
+AS_IS=COUNT(*)
 ";
         $this->assertSame(
             $expected,
@@ -95,6 +97,7 @@ Q='esc\\'aping'
                 'y' => 'options',
                 'z' => 'that"need',
                 'q' => 'esc\'aping',
+                'as_is' => new Expr('COUNT(*)'),
             ])
         );
     }
@@ -257,5 +260,51 @@ DISPLAY_NAME=\'Franta Vomacka\'
                 'role"na\'me'
             )
         );
+    }
+
+    /**
+     * @dataProvider provideQuotingData
+     * @param string|Expr $input
+     */
+    public function testQuoting(string $expected, $input): void
+    {
+        $this->assertSame($expected, QueryBuilder::quote($input));
+    }
+
+    public function provideQuotingData(): array
+    {
+        return [
+            'Expression' => [
+                'COUNT(*)',
+                new Connection\Expr('COUNT(*)'),
+            ],
+            'Single quote' => [
+                "'lorem\'ipsum'",
+                "lorem'ipsum",
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider provideIdentifierQuotingData
+     * @param string|Expr $input
+     */
+    public function testIdentifierQuoting(string $expected, $input): void
+    {
+        $this->assertSame($expected, QueryBuilder::quoteIdentifier($input));
+    }
+
+    public function provideIdentifierQuotingData(): array
+    {
+        return [
+            'Expression' => [
+                'COUNT(*)',
+                new Connection\Expr('COUNT(*)'),
+            ],
+            'Double quote' => [
+                '"lorem\'ipsum"',
+                "lorem'ipsum",
+            ],
+        ];
     }
 }
