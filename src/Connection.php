@@ -431,7 +431,7 @@ class Connection
      * @deprecated use QueryBuilder::quote instead
      */
     // phpcs:ignore SlevomatCodingStandard.TypeHints.TypeHintDeclaration.UselessDocComment
-    public static function quote(string $value): string
+    public function quote(string $value): string
     {
         return QueryBuilder::quote($value);
     }
