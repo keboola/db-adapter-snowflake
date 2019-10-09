@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Keboola\SnowflakeDbAdapter;
 
 use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
-use Keboola\SnowflakeDbAdapter\Connection\Expr;
 
 class Connection
 {
@@ -270,16 +269,6 @@ class Connection
         );
     }
 
-    public static function createQuotedOptionsStringFromArray(array $otherOptions): string
-    {
-        $otherOptionsString = '';
-        foreach ($otherOptions as $option => $optionValue) {
-            $quotedValue = $optionValue instanceof Expr ? $optionValue->getValue() : Connection::quote($optionValue);
-            $otherOptionsString .= strtoupper($option) . '=' . $quotedValue . \PHP_EOL;
-        }
-        return $otherOptionsString;
-    }
-
     public function createRole(string $roleName): void
     {
         $this->query(
@@ -438,10 +427,13 @@ class Connection
         );
     }
 
+    /**
+     * @deprecated use QueryBuilder::quote instead
+     */
+    // phpcs:ignore SlevomatCodingStandard.TypeHints.TypeHintDeclaration.UselessDocComment
     public static function quote(string $value): string
     {
-        $q = "'";
-        return ($q . str_replace("$q", "$q$q", $value) . $q);
+        return QueryBuilder::quote($value);
     }
 
     private function revokeRoleFromObjectType(

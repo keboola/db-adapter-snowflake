@@ -32,6 +32,16 @@ class QueryBuilder
         return ($q . str_replace("$q", "$q$q", $value) . $q);
     }
 
+    public static function createQuotedOptionsStringFromArray(array $otherOptions): string
+    {
+        $otherOptionsString = '';
+        foreach ($otherOptions as $option => $optionValue) {
+            $quotedValue = $optionValue instanceof Expr ? $optionValue->getValue() : QueryBuilder::quote($optionValue);
+            $otherOptionsString .= strtoupper($option) . '=' . $quotedValue . \PHP_EOL;
+        }
+        return $otherOptionsString;
+    }
+
     public function showTableInSchema(string $schemaName, string $tableName): string
     {
         return sprintf(
@@ -65,7 +75,7 @@ class QueryBuilder
             'ALTER USER IF EXISTS 
             %s
             SET 
-            ' . Connection::createQuotedOptionsStringFromArray($options),
+            ' . self::createQuotedOptionsStringFromArray($options),
             [
                 self::quoteIdentifier($userName),
             ]
@@ -94,7 +104,7 @@ class QueryBuilder
 
     public function createUser(string $userName, string $password, array $otherOptions): string
     {
-        $otherOptionsString = Connection::createQuotedOptionsStringFromArray($otherOptions);
+        $otherOptionsString = self::createQuotedOptionsStringFromArray($otherOptions);
         return vsprintf(
             'CREATE USER IF NOT EXISTS 
             %s
