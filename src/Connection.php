@@ -5,11 +5,7 @@ declare(strict_types=1);
 namespace Keboola\SnowflakeDbAdapter;
 
 use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
-
 use Keboola\SnowflakeDbAdapter\Connection\Expr;
-use Keboola\SnowflakeDbAdapter\Exception\BaseException;
-use Keboola\SnowflakeDbAdapter\Exception\RuntimeException;
-use Throwable;
 
 class Connection
 {
@@ -266,17 +262,17 @@ class Connection
     public function alterUser(string $userName, array $options): void
     {
         if (!count($options)) {
-            throw new BaseException('Nothing to alter without options');
+            throw new SnowflakeDbAdapterException('Nothing to alter without options');
         }
 
         $this->query(
             vsprintf(
-                'ALTER USER IF EXISTS 
+                'ALTER USER IF EXISTS
             %s
-            SET 
+            SET
             ' . $this->createQuotedOptionsStringFromArray($options),
                 [
-                    $this->quoteIdentifier($userName),
+                    Connection::quoteIdentifier($userName),
                 ]
             )
         );
@@ -290,7 +286,7 @@ class Connection
     {
         $otherOptionsString = '';
         foreach ($otherOptions as $option => $optionValue) {
-            $quotedValue = $optionValue instanceof Expr ? $optionValue->getValue() : $this->quote($optionValue);
+            $quotedValue = $optionValue instanceof Expr ? $optionValue->getValue() : Connection::quote($optionValue);
             $otherOptionsString .= strtoupper($option) . '=' . $quotedValue . \PHP_EOL;
         }
         return $otherOptionsString;
@@ -302,7 +298,7 @@ class Connection
             vsprintf(
                 'CREATE ROLE IF NOT EXISTS %s',
                 [
-                    $this->quoteIdentifier($roleName),
+                    Connection::quoteIdentifier($roleName),
                 ]
             )
         );
@@ -314,7 +310,7 @@ class Connection
             vsprintf(
                 'CREATE SCHEMA IF NOT EXISTS %s',
                 [
-                    $this->quoteIdentifier($schema),
+                    Connection::quoteIdentifier($schema),
                 ]
             )
         );
@@ -326,13 +322,13 @@ class Connection
 
         $this->query(
             vsprintf(
-                'CREATE USER IF NOT EXISTS 
+                'CREATE USER IF NOT EXISTS
             %s
             PASSWORD = %s
             ' . $otherOptionsString,
                 [
-                    $this->quoteIdentifier($userName),
-                    $this->quote($password),
+                    Connection::quoteIdentifier($userName),
+                    Connection::quote($password),
                 ]
             )
         );
@@ -347,7 +343,7 @@ class Connection
             vsprintf(
                 'DESCRIBE USER %s',
                 [
-                    $this->quoteIdentifier($userName),
+                    Connection::quoteIdentifier($userName),
                 ]
             )
         );
@@ -364,7 +360,7 @@ class Connection
         $args = [];
         if ($roleLike !== null) {
             $sql .= ' LIKE %s';
-            $args[] = $this->quote($roleLike);
+            $args[] = Connection::quote($roleLike);
         }
 
         return $this->fetchAll(
@@ -381,7 +377,7 @@ class Connection
             vsprintf(
                 'SHOW SCHEMAS LIKE %s',
                 [
-                    $this->quote($schemaName),
+                    Connection::quote($schemaName),
                 ]
             )
         );
@@ -426,8 +422,8 @@ class Connection
             vsprintf(
                 'GRANT ROLE %s TO ' . $objectType . ' %s',
                 [
-                    $this->quoteIdentifier($role),
-                    $this->quoteIdentifier($granteeName),
+                    Connection::quoteIdentifier($role),
+                    Connection::quoteIdentifier($granteeName),
                 ]
             )
         );
@@ -449,8 +445,8 @@ class Connection
             vsprintf(
                 'GRANT SELECT ON ALL TABLES IN SCHEMA %s TO ROLE %s',
                 [
-                    $this->quoteIdentifier($schemaName),
-                    $this->quoteIdentifier($role),
+                    Connection::quoteIdentifier($schemaName),
+                    Connection::quoteIdentifier($role),
                 ]
             )
         );
@@ -465,12 +461,12 @@ class Connection
     ): void {
         $this->query(
             vsprintf(
-                'GRANT ' . implode(',', $grant) . ' 
+                'GRANT ' . implode(',', $grant) . '
             ON ' . $grantOnObjectType . ' %s
             TO ' . $granteeObjectType . ' %s',
                 [
-                    $this->quoteIdentifier($grantOnName),
-                    $this->quoteIdentifier($grantToName),
+                    Connection::quoteIdentifier($grantOnName),
+                    Connection::quoteIdentifier($grantToName),
                 ]
             )
         );
@@ -485,13 +481,13 @@ class Connection
     ): void {
         $this->query(
             vsprintf(
-                'GRANT ' . implode(',', $grant) . ' 
-            ON ALL ' . $grantOnObjectType . 'S 
+                'GRANT ' . implode(',', $grant) . '
+            ON ALL ' . $grantOnObjectType . 'S
             IN SCHEMA %s
             TO ' . $granteeObjectType . ' %s',
                 [
-                    $this->quoteIdentifier($schemaName),
-                    $this->quoteIdentifier($grantToName),
+                    Connection::quoteIdentifier($schemaName),
+                    Connection::quoteIdentifier($grantToName),
                 ]
             )
         );
@@ -512,7 +508,7 @@ class Connection
         );
     }
 
-    public function quote(string $value): string
+    public static function quote(string $value): string
     {
         $q = "'";
         return ($q . str_replace("$q", "$q$q", $value) . $q);
@@ -528,8 +524,8 @@ class Connection
                 'REVOKE ROLE %s
             FROM ' . $objectTypeGrantedTo . ' %s',
                 [
-                    $this->quoteIdentifier($grantedRole),
-                    $this->quoteIdentifier($roleGrantedTo),
+                    Connection::quoteIdentifier($grantedRole),
+                    Connection::quoteIdentifier($roleGrantedTo),
                 ]
             )
         );
@@ -549,7 +545,7 @@ class Connection
             vsprintf(
                 'SHOW GRANTS OF ROLE %s',
                 [
-                    $this->quoteIdentifier($role),
+                    Connection::quoteIdentifier($role),
                 ]
             )
         );
@@ -564,7 +560,7 @@ class Connection
             vsprintf(
                 'SHOW GRANTS TO ROLE %s',
                 [
-                    $this->quoteIdentifier($role),
+                    Connection::quoteIdentifier($role),
                 ]
             )
         );
