@@ -269,8 +269,8 @@ class Connection
             vsprintf(
                 'ALTER USER IF EXISTS
             %s
-            SET
-            ' . $this->createQuotedOptionsStringFromArray($options),
+            SET 
+            ' . Connection::createQuotedOptionsStringFromArray($options),
                 [
                     Connection::quoteIdentifier($userName),
                 ]
@@ -282,7 +282,7 @@ class Connection
      * @param array $otherOptions
      * @return string
      */
-    private function createQuotedOptionsStringFromArray(array $otherOptions): string
+    private static function createQuotedOptionsStringFromArray(array $otherOptions): string
     {
         $otherOptionsString = '';
         foreach ($otherOptions as $option => $optionValue) {
@@ -318,7 +318,7 @@ class Connection
 
     public function createUser(string $userName, string $password, array $otherOptions): void
     {
-        $otherOptionsString = $this->createQuotedOptionsStringFromArray($otherOptions);
+        $otherOptionsString = Connection::createQuotedOptionsStringFromArray($otherOptions);
 
         $this->query(
             vsprintf(
