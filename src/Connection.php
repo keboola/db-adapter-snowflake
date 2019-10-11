@@ -45,28 +45,28 @@ class Connection
         $tracing = isset($options['tracing']) ? (int) $options['tracing'] : 0;
         $maxBackoffAttempts = isset($options['maxBackoffAttempts']) ? (int) $options['maxBackoffAttempts'] : 5;
 
-        $dsn = "Driver=SnowflakeDSIIDriver;Server=" . $options['host'];
-        $dsn .= ";Port=" . $port;
-        $dsn .= ";Tracing=" . $tracing;
+        $dsn = 'Driver=SnowflakeDSIIDriver;Server=' . $options['host'];
+        $dsn .= ';Port=' . $port;
+        $dsn .= ';Tracing=' . $tracing;
 
         if (isset($options['loginTimeout'])) {
-            $dsn .= ";Login_timeout=" . (int) $options['loginTimeout'];
+            $dsn .= ';Login_timeout=' . (int) $options['loginTimeout'];
         }
 
         if (isset($options['networkTimeout'])) {
-            $dsn .= ";Network_timeout=" . (int) $options['networkTimeout'];
+            $dsn .= ';Network_timeout=' . (int) $options['networkTimeout'];
         }
 
         if (isset($options['queryTimeout'])) {
-            $dsn .= ";Query_timeout=" . (int) $options['queryTimeout'];
+            $dsn .= ';Query_timeout=' . (int) $options['queryTimeout'];
         }
 
         if (isset($options['database'])) {
-            $dsn .= ";Database=" . $this->quoteIdentifier($options['database']);
+            $dsn .= ';Database=' . $this->quoteIdentifier($options['database']);
         }
 
         if (isset($options['warehouse'])) {
-            $dsn .= ";Warehouse=" . $this->quoteIdentifier($options['warehouse']);
+            $dsn .= ';Warehouse=' . $this->quoteIdentifier($options['warehouse']);
         }
 
         $attemptNumber = 0;
@@ -78,13 +78,13 @@ class Connection
                 $this->connection = odbc_connect($dsn, $options['user'], $options['password']);
             } catch (\Throwable $e) {
                 // try again if it is a failed rest request
-                if (stristr($e->getMessage(), "S1000") !== false) {
+                if (stristr($e->getMessage(), 'S1000') !== false) {
                     $attemptNumber++;
                     if ($attemptNumber > $maxBackoffAttempts) {
-                        throw new Exception("Initializing Snowflake connection failed: " . $e->getMessage(), 0, $e);
+                        throw new Exception('Initializing Snowflake connection failed: ' . $e->getMessage(), 0, $e);
                     }
                 } else {
-                    throw new Exception("Initializing Snowflake connection failed: " . $e->getMessage(), 0, $e);
+                    throw new Exception('Initializing Snowflake connection failed: ' . $e->getMessage(), 0, $e);
                 }
             }
         } while ($this->connection === null);
@@ -114,7 +114,7 @@ class Connection
     public function describeTable(string $schemaName, string $tableName): array
     {
         $tables = $this->fetchAll(sprintf(
-            "SHOW TABLES LIKE %s IN SCHEMA %s",
+            'SHOW TABLES LIKE %s IN SCHEMA %s',
             "'" . addslashes($tableName) . "'",
             $this->quoteIdentifier($schemaName)
         ));
@@ -147,7 +147,7 @@ class Connection
     public function getTablePrimaryKey(string $schemaName, string $tableName): array
     {
         $cols = $this->fetchAll(sprintf(
-            "DESC TABLE %s.%s",
+            'DESC TABLE %s.%s',
             $this->quoteIdentifier($schemaName),
             $this->quoteIdentifier($tableName)
         ));
