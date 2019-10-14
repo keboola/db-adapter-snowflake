@@ -9,4 +9,13 @@ before_script:
   - export APP_IMAGE=keboola-component
   - docker -v
   - docker build -t $APP_IMAGE .
-  - docker run $APP_IMAGE composer ci
+  - >-
+    docker
+    run
+    -e SNOWFLAKE_HOST
+    -e SNOWFLAKE_DATABASE
+    -e SNOWFLAKE_USER
+    -e SNOWFLAKE_PASSWORD
+    -e SNOWFLAKE_WAREHOUSE
+    $APP_IMAGE
+    composer ci
