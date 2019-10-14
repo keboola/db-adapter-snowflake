@@ -13,6 +13,9 @@ class Connection
      */
     private $connection;
 
+    /** @var QueryBuilder */
+    private $queryBuilder;
+
     /**
      * The connection constructor accepts the following options:
      * - host (string, required) - hostname
@@ -35,6 +38,7 @@ class Connection
      */
     public function __construct(array $options)
     {
+        $this->queryBuilder = new QueryBuilder();
         $requiredOptions = [
             'host',
             'user',
@@ -67,11 +71,11 @@ class Connection
         }
 
         if (isset($options['database'])) {
-            $dsn .= ';Database=' . $this->quoteIdentifier($options['database']);
+            $dsn .= ';Database=' . QueryBuilder::quoteIdentifier($options['database']);
         }
 
         if (isset($options['warehouse'])) {
-            $dsn .= ';Warehouse=' . $this->quoteIdentifier($options['warehouse']);
+            $dsn .= ';Warehouse=' . QueryBuilder::quoteIdentifier($options['warehouse']);
         }
 
         $attemptNumber = 0;
@@ -105,13 +109,18 @@ class Connection
 
     public function __destruct()
     {
-        odbc_close($this->connection);
+        if (is_resource($this->connection)) {
+            odbc_close($this->connection);
+        }
     }
 
+    /**
+     * @deprecated use QueryBuilder::quoteIdentifier instead
+     */
+    // phpcs:ignore SlevomatCodingStandard.TypeHints.TypeHintDeclaration.UselessDocComment
     public function quoteIdentifier(string $value): string
     {
-        $q = '"';
-        return ($q . str_replace("$q", "$q$q", $value) . $q);
+        return QueryBuilder::quoteIdentifier($value);
     }
 
     /**
@@ -122,11 +131,7 @@ class Connection
      */
     public function describeTable(string $schemaName, string $tableName): array
     {
-        $tables = $this->fetchAll(sprintf(
-            'SHOW TABLES LIKE %s IN SCHEMA %s',
-            "'" . addslashes($tableName) . "'",
-            $this->quoteIdentifier($schemaName)
-        ));
+        $tables = $this->fetchAll($this->queryBuilder->showTableInSchema($schemaName, $tableName));
 
         foreach ($tables as $table) {
             if ($table['name'] === $tableName) {
@@ -139,11 +144,7 @@ class Connection
 
     public function describeTableColumns(string $schemaName, string $tableName): array
     {
-        return $this->fetchAll(sprintf(
-            'SHOW COLUMNS IN %s.%s',
-            $this->quoteIdentifier($schemaName),
-            $this->quoteIdentifier($tableName)
-        ));
+        return $this->fetchAll($this->queryBuilder->showColumns($schemaName, $tableName));
     }
 
     public function getTableColumns(string $schemaName, string $tableName): array
@@ -155,11 +156,7 @@ class Connection
 
     public function getTablePrimaryKey(string $schemaName, string $tableName): array
     {
-        $cols = $this->fetchAll(sprintf(
-            'DESC TABLE %s.%s',
-            $this->quoteIdentifier($schemaName),
-            $this->quoteIdentifier($tableName)
-        ));
+        $cols = $this->fetchAll($this->queryBuilder->describeTable($schemaName, $tableName));
         $pkCols = [];
         foreach ($cols as $col) {
             if ($col['primary key'] !== 'Y') {
