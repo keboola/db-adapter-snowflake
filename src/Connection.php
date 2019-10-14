@@ -22,9 +22,14 @@ class Connection
      * - warehouse (string) - default warehouse to use
      * - database (string) - default database to use
      * - tracing (int) - the level of detail to be logged in the driver trace files
-     * - loginTimeout (int) - Specifies how long to wait for a response when connecting to the Snowflake service before returning a login failure error.
-     * - networkTimeout (int) - Specifies how long to wait for a response when interacting with the Snowflake service before returning an error. Zero (0) indicates no network timeout is set.
-     * - queryTimeout (int) - Specifies how long to wait for a query to complete before returning an error. Zero (0) indicates to wait indefinitely.
+     * - loginTimeout (int) - Specifies how long to wait for a response when
+     * connecting to the Snowflake service before returning a login failure
+     * error.
+     * - networkTimeout (int) - Specifies how long to wait for a response when
+     * interacting with the Snowflake service before returning an error. Zero
+     * (0) indicates no network timeout is set.
+     * - queryTimeout (int) - Specifies how long to wait for a query to complete
+     * before returning an error. Zero (0) indicates to wait indefinitely.
      *
      * @param array $options
      */
