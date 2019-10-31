@@ -45,9 +45,28 @@ class Connection
             'password',
         ];
 
+        $allowedOptions = [
+            'host',
+            'user',
+            'password',
+            'port',
+            'tracing',
+            'loginTimeout',
+            'networkTimeout',
+            'queryTimeout',
+            'maxBackoffAttempts',
+            'database',
+            'warehouse',
+        ];
+
         $missingOptions = array_diff($requiredOptions, array_keys($options));
         if (!empty($missingOptions)) {
             throw new BaseException('Missing options: ' . implode(', ', $missingOptions));
+        }
+
+        $unknownOptions = array_diff(array_keys($options), $allowedOptions);
+        if (!empty($unknownOptions)) {
+            throw new BaseException('Unknown options: ' . implode(', ', $unknownOptions));
         }
 
         $port = isset($options['port']) ? (int) $options['port'] : 443;
