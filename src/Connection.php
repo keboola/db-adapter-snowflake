@@ -128,9 +128,7 @@ class Connection
 
     public function __destruct()
     {
-        if (is_resource($this->connection)) {
-            odbc_close($this->connection);
-        }
+        $this->disconnect();
     }
 
     /**
@@ -242,5 +240,12 @@ class Connection
                 return $value;
             }
         }, $bind);
+    }
+
+    public function disconnect(): void
+    {
+        if (is_resource($this->connection)) {
+            odbc_close($this->connection);
+        }
     }
 }
