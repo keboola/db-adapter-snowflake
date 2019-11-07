@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\SnowflakeDbAdapter\Exception;
 
-class WarehouseTimeoutReached extends BaseException
+class WarehouseTimeoutReached extends SnowflakeDbAdapterException
 {
 
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\SnowflakeDbAdapter\Exception;
 
-class BaseException extends \Exception implements SnowflakeDbAdapterException
+interface ExceptionInterface extends \Throwable
 {
+
 }

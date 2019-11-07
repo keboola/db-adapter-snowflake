@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Keboola\SnowflakeDbAdapter;
 
-use Keboola\SnowflakeDbAdapter\Exception\BaseException;
-use Keboola\SnowflakeDbAdapter\Exception\RuntimeException;
 use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
+use Keboola\SnowflakeDbAdapter\Exception\RuntimeException;
+use Keboola\SnowflakeDbAdapter\Exception\ExceptionInterface;
 use Keboola\SnowflakeDbAdapter\Exception\StringTooLongException;
 use Keboola\SnowflakeDbAdapter\Exception\WarehouseTimeoutReached;
 
@@ -41,9 +41,9 @@ class ExceptionHandler
                 $e
             );
         }
-        if ($e instanceof SnowflakeDbAdapterException) {
+        if ($e instanceof ExceptionInterface) {
             throw $e;
         }
-        throw new BaseException($e->getMessage(), $e->getCode(), $e);
+        throw new SnowflakeDbAdapterException($e->getMessage(), $e->getCode(), $e);
     }
 }

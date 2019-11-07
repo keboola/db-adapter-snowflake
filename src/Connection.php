@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\SnowflakeDbAdapter;
 
-use Keboola\SnowflakeDbAdapter\Exception\BaseException;
+use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
 
 class Connection
 {
@@ -61,12 +61,12 @@ class Connection
 
         $missingOptions = array_diff($requiredOptions, array_keys($options));
         if (!empty($missingOptions)) {
-            throw new BaseException('Missing options: ' . implode(', ', $missingOptions));
+            throw new SnowflakeDbAdapterException('Missing options: ' . implode(', ', $missingOptions));
         }
 
         $unknownOptions = array_diff(array_keys($options), $allowedOptions);
         if (!empty($unknownOptions)) {
-            throw new BaseException('Unknown options: ' . implode(', ', $unknownOptions));
+            throw new SnowflakeDbAdapterException('Unknown options: ' . implode(', ', $unknownOptions));
         }
 
         $port = isset($options['port']) ? (int) $options['port'] : 443;
@@ -109,14 +109,14 @@ class Connection
                 if (stristr($e->getMessage(), 'S1000') !== false) {
                     $attemptNumber++;
                     if ($attemptNumber > $maxBackoffAttempts) {
-                        throw new BaseException(
+                        throw new SnowflakeDbAdapterException(
                             'Initializing Snowflake connection failed: ' . $e->getMessage(),
                             0,
                             $e
                         );
                     }
                 } else {
-                    throw new BaseException(
+                    throw new SnowflakeDbAdapterException(
                         'Initializing Snowflake connection failed: ' . $e->getMessage(),
                         0,
                         $e
@@ -156,7 +156,7 @@ class Connection
             }
         }
 
-        throw new BaseException("Table $tableName not found in schema $schemaName");
+        throw new SnowflakeDbAdapterException("Table $tableName not found in schema $schemaName");
     }
 
     public function describeTableColumns(string $schemaName, string $tableName): array

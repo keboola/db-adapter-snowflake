@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Keboola\SnowflakeDbAdapter\Tests;
 
 use InvalidArgumentException;
-use Keboola\SnowflakeDbAdapter\Exception\BaseException;
+use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
 use Keboola\SnowflakeDbAdapter\Exception\RuntimeException;
 use Keboola\SnowflakeDbAdapter\Exception\StringTooLongException;
 use Keboola\SnowflakeDbAdapter\Exception\WarehouseTimeoutReached;
@@ -45,7 +45,7 @@ class ExceptionHandlerTest extends TestCase
                 new \Exception('Statement reached its statement or warehouse timeout of 800 seconds SQL state 57014'),
             ],
             'random exception' => [
-                BaseException::class,
+                SnowflakeDbAdapterException::class,
                 'Invalid argument "x"',
                 new InvalidArgumentException('Invalid argument "x"'),
             ],

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Keboola\SnowflakeDbAdapter\Tests;
 
 use Keboola\SnowflakeDbAdapter\Connection;
-use Keboola\SnowflakeDbAdapter\Exception\BaseException;
+use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -26,7 +26,7 @@ class ConnectionTest extends TestCase
 
     public function testFailsToConnectWithUnknownParams(): void
     {
-        $this->expectException(BaseException::class);
+        $this->expectException(SnowflakeDbAdapterException::class);
         $this->expectExceptionMessage('Unknown options: someRandomParameter, otherRandomParameter, 0');
 
         new Connection([
@@ -41,7 +41,7 @@ class ConnectionTest extends TestCase
 
     public function testFailsWhenRequiredParamsMissing(): void
     {
-        $this->expectException(BaseException::class);
+        $this->expectException(SnowflakeDbAdapterException::class);
         $this->expectExceptionMessage('Missing options: user');
 
         new Connection([
