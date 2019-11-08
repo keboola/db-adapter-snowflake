@@ -1,4 +1,5 @@
 {
+    "name": "keboola/db-adapter-snowflake",
     "require": {
         "php": "^7.1",
         "ext-odbc": "*"

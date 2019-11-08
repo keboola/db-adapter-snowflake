@@ -2,6 +2,12 @@ version: '2'
 services:
   dev:
     build: .
+    environment:
+      - SNOWFLAKE_HOST
+      - SNOWFLAKE_DATABASE
+      - SNOWFLAKE_USER
+      - SNOWFLAKE_PASSWORD
+      - SNOWFLAKE_WAREHOUSE
     volumes:
       - ./:/code
       - ./data:/data
