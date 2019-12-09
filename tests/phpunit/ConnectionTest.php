@@ -66,4 +66,31 @@ class ConnectionTest extends TestCase
         $this->assertSame('Unknown', get_resource_type($connectionProperty->getValue($connection)));
         $connectionProperty->setAccessible(false);
     }
+
+    public function testQueryTagging(): void
+    {
+        $connection = new Connection([
+            'host' => getenv('SNOWFLAKE_HOST'),
+            'user' => getenv('SNOWFLAKE_USER'),
+            'password' => getenv('SNOWFLAKE_PASSWORD'),
+            'database' => getenv('SNOWFLAKE_DATABASE'),
+            'warehouse' => getenv('SNOWFLAKE_WAREHOUSE'),
+            'runId' => 'runIdValue',
+        ]);
+
+        $connection->fetchAll('SELECT current_date;');
+        $queries = $connection->fetchAll(
+            '
+                SELECT 
+                    QUERY_TEXT, QUERY_TAG 
+                FROM 
+                    TABLE(INFORMATION_SCHEMA.QUERY_HISTORY_BY_SESSION())
+                WHERE QUERY_TEXT = \'SELECT current_date;\' 
+                ORDER BY START_TIME DESC 
+                LIMIT 1
+            '
+        );
+
+        $this->assertEquals('{"runId":"runIdValue"}', $queries[0]['QUERY_TAG']);
+    }
 }
