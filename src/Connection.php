@@ -56,6 +56,7 @@ class Connection
             'queryTimeout',
             'maxBackoffAttempts',
             'database',
+            'schema',
             'warehouse',
             'runId',
         ];
@@ -92,6 +93,10 @@ class Connection
 
         if (isset($options['database'])) {
             $dsn .= ';Database=' . QueryBuilder::quoteIdentifier($options['database']);
+        }
+
+        if (isset($options['schema'])) {
+            $dsn .= ';Schema=' . $this->quoteIdentifier($options['schema']);
         }
 
         if (isset($options['warehouse'])) {

@@ -210,6 +210,30 @@ class IntegrationTest extends TestCase
         }
     }
 
+    public function testSchema(): void
+    {
+        $connection = new Connection([
+            'host' => getenv('SNOWFLAKE_HOST'),
+            'user' => getenv('SNOWFLAKE_USER'),
+            'password' => getenv('SNOWFLAKE_PASSWORD'),
+            'database' => getenv('SNOWFLAKE_DATABASE'),
+            'schema' => $this->sourceSchemaName,
+            'warehouse' => getenv('SNOWFLAKE_WAREHOUSE'),
+        ]);
+
+        //tests if you set schema in constructor it really set in connection
+        $this->assertSame(
+            $this->sourceSchemaName,
+            $connection->fetchAll('SELECT CURRENT_SCHEMA()')[0]['CURRENT_SCHEMA()']
+        );
+
+        //main connection has still different schema
+        $this->assertSame(
+            $this->destSchemaName,
+            $this->connection->fetchAll('SELECT CURRENT_SCHEMA()')[0]['CURRENT_SCHEMA()']
+        );
+    }
+
     private function prepareSchema(Connection $connection, string $schemaName): void
     {
         $connection->query(sprintf('DROP SCHEMA IF EXISTS "%s"', $schemaName));
