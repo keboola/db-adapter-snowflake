@@ -110,7 +110,9 @@ class Connection
             }
             try {
                 $this->connection = odbc_connect($dsn, $options['user'], $options['password']);
-                $this->checkAccessToDatabase($options);
+                if (isset($options['database'])) {
+                    $this->checkAccessToDatabase($options);
+                }
                 if (isset($options['schema'])) {
                     $this->checkAccessToSchema($options);
                 }
