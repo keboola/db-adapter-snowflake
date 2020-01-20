@@ -174,7 +174,12 @@ class Connection
 
     private function checkAccessToSchema(array $options): void
     {
-        $schemas = $this->fetchAll(sprintf('SHOW SCHEMAS IN DATABASE %s', QueryBuilder::quoteIdentifier($options['database'])));
+        $schemas = $this->fetchAll(
+            sprintf(
+                'SHOW SCHEMAS IN DATABASE %s',
+                QueryBuilder::quoteIdentifier($options['database'])
+            )
+        );
         $filteredSchemas = array_filter($schemas, function ($schema) use ($options) {
             if ($schema['name'] !== $options['schema']) {
                 return false;
