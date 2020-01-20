@@ -24,6 +24,44 @@ class ConnectionTest extends TestCase
         $this->assertSame('1', $res[0]['result']);
     }
 
+    public function testInvalidAccessToDatabase(): void
+    {
+        $invalidDatabase = 'invalidDatabase';
+        $this->expectException(SnowflakeDbAdapterException::class);
+        $this->expectExceptionMessage(
+            sprintf(
+                'Initializing Snowflake connection failed: You cannot access to database "%s"',
+                $invalidDatabase
+            )
+        );
+        new Connection([
+            'host' => getenv('SNOWFLAKE_HOST'),
+            'user' => getenv('SNOWFLAKE_USER'),
+            'password' => getenv('SNOWFLAKE_PASSWORD'),
+            'database' => $invalidDatabase,
+        ]);
+    }
+
+    public function testInvalidAccessToSchema(): void
+    {
+        $invalidSchema = 'invalidSchema';
+        $this->expectException(SnowflakeDbAdapterException::class);
+        $this->expectExceptionMessage(
+            sprintf(
+                'Initializing Snowflake connection failed: You cannot access to schema "%s" in database "%s"',
+                $invalidSchema,
+                getenv('SNOWFLAKE_DATABASE')
+            )
+        );
+        new Connection([
+            'host' => getenv('SNOWFLAKE_HOST'),
+            'user' => getenv('SNOWFLAKE_USER'),
+            'password' => getenv('SNOWFLAKE_PASSWORD'),
+            'database' => getenv('SNOWFLAKE_DATABASE'),
+            'schema' => $invalidSchema,
+        ]);
+    }
+
     public function testFailsToConnectWithUnknownParams(): void
     {
         $this->expectException(SnowflakeDbAdapterException::class);
