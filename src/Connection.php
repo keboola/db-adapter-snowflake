@@ -110,6 +110,10 @@ class Connection
             }
             try {
                 $this->connection = odbc_connect($dsn, $options['user'], $options['password']);
+                $this->checkAccessToDatabase($options);
+                if (isset($options['schema'])) {
+                    $this->checkAccessToSchema($options);
+                }
 
                 if (isset($options['runId'])) {
                     $queryTag = [
@@ -151,6 +155,42 @@ class Connection
     public function quoteIdentifier(string $value): string
     {
         return QueryBuilder::quoteIdentifier($value);
+    }
+
+    private function checkAccessToDatabase(array $options): void
+    {
+        $databases = $this->fetchAll('SHOW DATABASES');
+        $filteredDatabases = array_filter($databases, function ($database) use ($options) {
+            if ($database['name'] !== $options['database']) {
+                return false;
+            }
+            return true;
+        });
+
+        if (count($filteredDatabases) === 0) {
+            throw new SnowflakeDbAdapterException(sprintf('You cannot access to database "%s"', $options['database']));
+        }
+    }
+
+    private function checkAccessToSchema(array $options): void
+    {
+        $schemas = $this->fetchAll(sprintf('SHOW SCHEMAS IN DATABASE %s', QueryBuilder::quoteIdentifier($options['database'])));
+        $filteredSchemas = array_filter($schemas, function ($schema) use ($options) {
+            if ($schema['name'] !== $options['schema']) {
+                return false;
+            }
+            return true;
+        });
+
+        if (count($filteredSchemas) === 0) {
+            throw new SnowflakeDbAdapterException(
+                sprintf(
+                    'You cannot access to schema "%s" in database "%s"',
+                    $options['schema'],
+                    $options['database']
+                )
+            );
+        }
     }
 
     /**
