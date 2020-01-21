@@ -27,6 +27,14 @@ class ConnectionTest extends TestCase
     public function testInvalidAccessToDatabase(): void
     {
         $invalidDatabase = 'invalidDatabase';
+        $config = [
+            'host' => getenv('SNOWFLAKE_HOST'),
+            'user' => getenv('SNOWFLAKE_USER'),
+            'password' => getenv('SNOWFLAKE_PASSWORD'),
+            'database' => $invalidDatabase,
+        ];
+        $connection = new Connection($config);
+
         $this->expectException(SnowflakeDbAdapterException::class);
         $this->expectExceptionMessage(
             sprintf(
@@ -34,17 +42,20 @@ class ConnectionTest extends TestCase
                 $invalidDatabase
             )
         );
-        new Connection([
-            'host' => getenv('SNOWFLAKE_HOST'),
-            'user' => getenv('SNOWFLAKE_USER'),
-            'password' => getenv('SNOWFLAKE_PASSWORD'),
-            'database' => $invalidDatabase,
-        ]);
+        $connection->checkAccessToDatabase($config);
     }
 
     public function testInvalidAccessToSchema(): void
     {
         $invalidSchema = 'invalidSchema';
+        $config = [
+            'host' => getenv('SNOWFLAKE_HOST'),
+            'user' => getenv('SNOWFLAKE_USER'),
+            'password' => getenv('SNOWFLAKE_PASSWORD'),
+            'database' => getenv('SNOWFLAKE_DATABASE'),
+            'schema' => $invalidSchema,
+        ];
+        $connection = new Connection($config);
         $this->expectException(SnowflakeDbAdapterException::class);
         $this->expectExceptionMessage(
             sprintf(
@@ -53,13 +64,7 @@ class ConnectionTest extends TestCase
                 getenv('SNOWFLAKE_DATABASE')
             )
         );
-        new Connection([
-            'host' => getenv('SNOWFLAKE_HOST'),
-            'user' => getenv('SNOWFLAKE_USER'),
-            'password' => getenv('SNOWFLAKE_PASSWORD'),
-            'database' => getenv('SNOWFLAKE_DATABASE'),
-            'schema' => $invalidSchema,
-        ]);
+        $connection->checkAccessToSchema($config);
     }
 
     public function testFailsToConnectWithUnknownParams(): void

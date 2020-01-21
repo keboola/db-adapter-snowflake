@@ -110,12 +110,6 @@ class Connection
             }
             try {
                 $this->connection = odbc_connect($dsn, $options['user'], $options['password']);
-                if (isset($options['database'])) {
-                    $this->checkAccessToDatabase($options);
-                }
-                if (isset($options['schema'])) {
-                    $this->checkAccessToSchema($options);
-                }
 
                 if (isset($options['runId'])) {
                     $queryTag = [
@@ -159,31 +153,31 @@ class Connection
         return QueryBuilder::quoteIdentifier($value);
     }
 
-    private function checkAccessToDatabase(array $options): void
+    public function checkAccessToDatabase(array $dbConfig): void
     {
         $databases = $this->fetchAll('SHOW DATABASES');
-        $filteredDatabases = array_filter($databases, function ($database) use ($options) {
-            if ($database['name'] !== $options['database']) {
+        $filteredDatabases = array_filter($databases, function ($database) use ($dbConfig) {
+            if ($database['name'] !== $dbConfig['database']) {
                 return false;
             }
             return true;
         });
 
         if (count($filteredDatabases) === 0) {
-            throw new SnowflakeDbAdapterException(sprintf('You cannot access to database "%s"', $options['database']));
+            throw new SnowflakeDbAdapterException(sprintf('You cannot access to database "%s"', $dbConfig['database']));
         }
     }
 
-    private function checkAccessToSchema(array $options): void
+    public function checkAccessToSchema(array $dbConfig): void
     {
         $schemas = $this->fetchAll(
             sprintf(
                 'SHOW SCHEMAS IN DATABASE %s',
-                QueryBuilder::quoteIdentifier($options['database'])
+                QueryBuilder::quoteIdentifier($dbConfig['database'])
             )
         );
-        $filteredSchemas = array_filter($schemas, function ($schema) use ($options) {
-            if ($schema['name'] !== $options['schema']) {
+        $filteredSchemas = array_filter($schemas, function ($schema) use ($dbConfig) {
+            if ($schema['name'] !== $dbConfig['schema']) {
                 return false;
             }
             return true;
@@ -193,8 +187,8 @@ class Connection
             throw new SnowflakeDbAdapterException(
                 sprintf(
                     'You cannot access to schema "%s" in database "%s"',
-                    $options['schema'],
-                    $options['database']
+                    $dbConfig['schema'],
+                    $dbConfig['database']
                 )
             );
         }
