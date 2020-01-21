@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Keboola\SnowflakeDbAdapter;
 
-use Keboola\SnowflakeDbAdapter\Exception\RuntimeException;
 use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
 
 class Connection
