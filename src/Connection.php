@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\SnowflakeDbAdapter;
 
+use Keboola\SnowflakeDbAdapter\Exception\RuntimeException;
 use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
 
 class Connection
@@ -151,47 +152,6 @@ class Connection
     public function quoteIdentifier(string $value): string
     {
         return QueryBuilder::quoteIdentifier($value);
-    }
-
-    public function checkAccessToDatabase(array $dbConfig): void
-    {
-        $databases = $this->fetchAll('SHOW DATABASES');
-        $filteredDatabases = array_filter($databases, function ($database) use ($dbConfig) {
-            if ($database['name'] !== $dbConfig['database']) {
-                return false;
-            }
-            return true;
-        });
-
-        if (count($filteredDatabases) === 0) {
-            throw new SnowflakeDbAdapterException(sprintf('You cannot access to database "%s"', $dbConfig['database']));
-        }
-    }
-
-    public function checkAccessToSchema(array $dbConfig): void
-    {
-        $schemas = $this->fetchAll(
-            sprintf(
-                'SHOW SCHEMAS IN DATABASE %s',
-                QueryBuilder::quoteIdentifier($dbConfig['database'])
-            )
-        );
-        $filteredSchemas = array_filter($schemas, function ($schema) use ($dbConfig) {
-            if ($schema['name'] !== $dbConfig['schema']) {
-                return false;
-            }
-            return true;
-        });
-
-        if (count($filteredSchemas) === 0) {
-            throw new SnowflakeDbAdapterException(
-                sprintf(
-                    'You cannot access to schema "%s" in database "%s"',
-                    $dbConfig['schema'],
-                    $dbConfig['database']
-                )
-            );
-        }
     }
 
     /**
