@@ -38,7 +38,7 @@ class ConnectionTest extends TestCase
         $this->expectException(SnowflakeDbAdapterException::class);
         $this->expectExceptionMessage(
             sprintf(
-                'Initializing Snowflake connection failed: You cannot access to database "%s"',
+                'You cannot access to database "%s"',
                 $invalidDatabase
             )
         );
@@ -59,7 +59,7 @@ class ConnectionTest extends TestCase
         $this->expectException(SnowflakeDbAdapterException::class);
         $this->expectExceptionMessage(
             sprintf(
-                'Initializing Snowflake connection failed: You cannot access to schema "%s" in database "%s"',
+                'You cannot access to schema "%s" in database "%s"',
                 $invalidSchema,
                 getenv('SNOWFLAKE_DATABASE')
             )
