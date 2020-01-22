@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Keboola\SnowflakeDbAdapter\Tests;
 
 use Keboola\SnowflakeDbAdapter\Connection;
-use Keboola\SnowflakeDbAdapter\Exception\CannotAccessToObjectException;
+use Keboola\SnowflakeDbAdapter\Exception\CannotAccessObjectException;
 use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
 use Keboola\SnowflakeDbAdapter\QueryBuilder;
 use PHPUnit\Framework\TestCase;
@@ -37,10 +37,10 @@ class ConnectionTest extends TestCase
         ];
         $connection = new Connection($config);
 
-        $this->expectException(CannotAccessToObjectException::class);
+        $this->expectException(CannotAccessObjectException::class);
         $this->expectExceptionMessage(
             sprintf(
-                'Cannot access to object or does not exist. Executing query "USE DATABASE %s"',
+                'Cannot access object or it does not exist. Executing query "USE DATABASE %s"',
                 QueryBuilder::quoteIdentifier($invalidDatabase)
             )
         );
@@ -58,10 +58,10 @@ class ConnectionTest extends TestCase
             'schema' => $invalidSchema,
         ];
         $connection = new Connection($config);
-        $this->expectException(CannotAccessToObjectException::class);
+        $this->expectException(CannotAccessObjectException::class);
         $this->expectExceptionMessage(
             sprintf(
-                'Cannot access to object or does not exist. Executing query "USE SCHEMA %s"',
+                'Cannot access object or it does not exist. Executing query "USE SCHEMA %s"',
                 QueryBuilder::quoteIdentifier($invalidSchema)
             )
         );

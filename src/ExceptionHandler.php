@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\SnowflakeDbAdapter;
 
-use Keboola\SnowflakeDbAdapter\Exception\CannotAccessToObjectException;
+use Keboola\SnowflakeDbAdapter\Exception\CannotAccessObjectException;
 use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
 use Keboola\SnowflakeDbAdapter\Exception\RuntimeException;
 use Keboola\SnowflakeDbAdapter\Exception\ExceptionInterface;
@@ -36,7 +36,7 @@ class ExceptionHandler
         }
 
         if ($sql && strpos($e->getMessage(), 'Object does not exist')) {
-            throw new CannotAccessToObjectException(
+            throw new CannotAccessObjectException(
                 sprintf('Cannot access object or it does not exist. Executing query "%s"', $sql)
             );
         }
