@@ -37,7 +37,7 @@ class ExceptionHandler
 
         if ($sql && strpos($e->getMessage(), 'Object does not exist')) {
             throw new CannotAccessToObjectException(
-                sprintf('Cannot access to object or does not exist. Executing query "%s"', $sql)
+                sprintf('Cannot access object or it does not exist. Executing query "%s"', $sql)
             );
         }
 
