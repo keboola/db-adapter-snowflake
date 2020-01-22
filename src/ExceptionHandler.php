@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\SnowflakeDbAdapter;
 
+use Keboola\SnowflakeDbAdapter\Exception\CannotAccessObjectException;
 use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
 use Keboola\SnowflakeDbAdapter\Exception\RuntimeException;
 use Keboola\SnowflakeDbAdapter\Exception\ExceptionInterface;
@@ -32,6 +33,12 @@ class ExceptionHandler
                 'Query reached its timeout %d second(s)',
                 $matches
             ));
+        }
+
+        if ($sql && strpos($e->getMessage(), 'Object does not exist')) {
+            throw new CannotAccessObjectException(
+                sprintf('Cannot access object or it does not exist. Executing query "%s"', $sql)
+            );
         }
 
         if ($sql) {

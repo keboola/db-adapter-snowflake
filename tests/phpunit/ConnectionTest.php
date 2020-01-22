@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Keboola\SnowflakeDbAdapter\Tests;
 
 use Keboola\SnowflakeDbAdapter\Connection;
+use Keboola\SnowflakeDbAdapter\Exception\CannotAccessObjectException;
 use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
+use Keboola\SnowflakeDbAdapter\QueryBuilder;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -22,6 +24,48 @@ class ConnectionTest extends TestCase
         $this->assertInstanceOf(Connection::class, $connection);
         $res = $connection->fetchAll('SELECT 1 AS "result"');
         $this->assertSame('1', $res[0]['result']);
+    }
+
+    public function testInvalidAccessToDatabase(): void
+    {
+        $invalidDatabase = 'invalidDatabase';
+        $config = [
+            'host' => getenv('SNOWFLAKE_HOST'),
+            'user' => getenv('SNOWFLAKE_USER'),
+            'password' => getenv('SNOWFLAKE_PASSWORD'),
+            'database' => $invalidDatabase,
+        ];
+        $connection = new Connection($config);
+
+        $this->expectException(CannotAccessObjectException::class);
+        $this->expectExceptionMessage(
+            sprintf(
+                'Cannot access object or it does not exist. Executing query "USE DATABASE %s"',
+                QueryBuilder::quoteIdentifier($invalidDatabase)
+            )
+        );
+        $connection->query(sprintf('USE DATABASE %s', QueryBuilder::quoteIdentifier($invalidDatabase)));
+    }
+
+    public function testInvalidAccessToSchema(): void
+    {
+        $invalidSchema = 'invalidSchema';
+        $config = [
+            'host' => getenv('SNOWFLAKE_HOST'),
+            'user' => getenv('SNOWFLAKE_USER'),
+            'password' => getenv('SNOWFLAKE_PASSWORD'),
+            'database' => getenv('SNOWFLAKE_DATABASE'),
+            'schema' => $invalidSchema,
+        ];
+        $connection = new Connection($config);
+        $this->expectException(CannotAccessObjectException::class);
+        $this->expectExceptionMessage(
+            sprintf(
+                'Cannot access object or it does not exist. Executing query "USE SCHEMA %s"',
+                QueryBuilder::quoteIdentifier($invalidSchema)
+            )
+        );
+        $connection->query(sprintf('USE SCHEMA %s', QueryBuilder::quoteIdentifier($invalidSchema)));
     }
 
     public function testFailsToConnectWithUnknownParams(): void
