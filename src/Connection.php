@@ -33,7 +33,7 @@ class Connection
      * (0) indicates no network timeout is set.
      * - queryTimeout (int) - Specifies how long to wait for a query to complete
      * before returning an error. Zero (0) indicates to wait indefinitely.
-     * - clientSessionKeepAlive - Parameter that indicates whether to force a user
+     * - clientSessionKeepAlive (bool) - Parameter that indicates whether to force a user
      * to log in again after a period of inactivity in the session
      *
      * @param array $options
