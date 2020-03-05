@@ -33,6 +33,8 @@ class Connection
      * (0) indicates no network timeout is set.
      * - queryTimeout (int) - Specifies how long to wait for a query to complete
      * before returning an error. Zero (0) indicates to wait indefinitely.
+     * - clientSessionKeepAlive - Parameter that indicates whether to force a user
+     * to log in again after a period of inactivity in the session
      *
      * @param array $options
      */
@@ -59,6 +61,7 @@ class Connection
             'schema',
             'warehouse',
             'runId',
+            'clientSessionKeepAlive',
         ];
 
         $missingOptions = array_diff($requiredOptions, array_keys($options));
@@ -101,6 +104,10 @@ class Connection
 
         if (isset($options['warehouse'])) {
             $dsn .= ';Warehouse=' . QueryBuilder::quoteIdentifier($options['warehouse']);
+        }
+
+        if (isset($options['clientSessionKeepAlive']) && $options['clientSessionKeepAlive']) {
+            $dsn .= ';CLIENT_SESSION_KEEP_ALIVE=TRUE';
         }
 
         $attemptNumber = 0;
