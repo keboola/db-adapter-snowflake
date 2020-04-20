@@ -2,6 +2,17 @@
 
 [![Build Status](https://travis-ci.com/keboola/db-adapter-snowflake.svg?branch=master)](https://travis-ci.com/keboola/db-adapter-snowflake)
 
+## Breaking changes
+
+### From `php-db-import`
+* no longer throws `Keboola\Db\Import\Exception`, but `\Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException`
+* rewritten `ExceptionHandler` does not throw `Keboola\Db\Import\Exception` but `\Keboola\SnowflakeDbAdapter\Exception\StringTooLongException` for too long string 
+* renamed method `\Keboola\SnowflakeDbAdapter\ExceptionHandler::handleException`
+
+### From `app-snowflake-dwh-manager`
+
+* no longer throws `\Exception`, but `\Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException`
+
 ## Development
  
 * Clone this repository and init the workspace with following command:

@@ -8,6 +8,15 @@ use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
 
 class Connection
 {
+    public const OBJECT_TYPE_DATABASE = 'DATABASE';
+    public const OBJECT_TYPE_ROLE = 'ROLE';
+    public const OBJECT_TYPE_SCHEMA = 'SCHEMA';
+    public const OBJECT_TYPE_TABLE = 'TABLE';
+    public const OBJECT_TYPE_VIEW = 'VIEW';
+    public const OBJECT_TYPE_STAGE = 'STAGE';
+    public const OBJECT_TYPE_USER = 'USER';
+    public const OBJECT_TYPE_WAREHOUSE = 'WAREHOUSE';
+
     /**
      * @var resource odbc handle
      */
@@ -267,5 +276,224 @@ class Connection
         if (is_resource($this->connection)) {
             odbc_close($this->connection);
         }
+    }
+
+    public function alterUser(string $userName, array $options): void
+    {
+        if (!count($options)) {
+            throw new SnowflakeDbAdapterException('Nothing to alter without options');
+        }
+
+        $this->query(
+            $this->queryBuilder->alterUser($userName, $options)
+        );
+    }
+
+    public function createRole(string $roleName): void
+    {
+        $this->query(
+            $this->queryBuilder->createRole($roleName)
+        );
+    }
+
+    public function createSchema(string $schema): void
+    {
+        $this->query(
+            $this->queryBuilder->createSchema($schema)
+        );
+    }
+
+    public function createUser(string $userName, string $password, array $otherOptions): void
+    {
+        $this->query(
+            $this->queryBuilder->createUser($userName, $password, $otherOptions)
+        );
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function describeUser(string $userName): array
+    {
+        $userFields = $this->fetchAll(
+            $this->queryBuilder->describeUser($userName)
+        );
+        $result = [];
+        foreach ($userFields as $userField) {
+            $result[strtolower($userField['property'])] = $userField['value'];
+        }
+        return $result;
+    }
+
+    public function fetchRoles(?string $roleLike = null): array
+    {
+        return $this->fetchAll(
+            $this->queryBuilder->showRoles($roleLike)
+        );
+    }
+
+    public function fetchSchemasLike(string $schemaName): array
+    {
+        return $this->fetchAll(
+            $this->queryBuilder->showSchemas($schemaName)
+        );
+    }
+
+    public function grantOnDatabaseToRole(string $database, string $role, array $grants): void
+    {
+        $this->grantToObjectTypeOnObjectType(
+            Connection::OBJECT_TYPE_DATABASE,
+            $database,
+            Connection::OBJECT_TYPE_ROLE,
+            $role,
+            $grants
+        );
+    }
+
+    public function grantOnSchemaToRole(string $schemaName, string $role, array $grants): void
+    {
+        $this->grantToObjectTypeOnObjectType(
+            Connection::OBJECT_TYPE_SCHEMA,
+            $schemaName,
+            Connection::OBJECT_TYPE_ROLE,
+            $role,
+            $grants
+        );
+    }
+
+    public function grantOnWarehouseToRole(string $warehouse, string $role, array $grants): void
+    {
+        $this->grantToObjectTypeOnObjectType(
+            Connection::OBJECT_TYPE_WAREHOUSE,
+            $warehouse,
+            Connection::OBJECT_TYPE_ROLE,
+            $role,
+            $grants
+        );
+    }
+
+    private function grantRoleToObject(string $role, string $granteeName, string $objectType): void
+    {
+        $this->query(
+            $this->queryBuilder->grantRoleToObjectType($role, $granteeName, $objectType)
+        );
+    }
+
+    public function grantRoleToRole(string $roleToBeGranted, string $roleToGrantTo): void
+    {
+        $this->grantRoleToObject($roleToBeGranted, $roleToGrantTo, self::OBJECT_TYPE_ROLE);
+    }
+
+    public function grantRoleToUser(string $role, string $userName): void
+    {
+        $this->grantRoleToObject($role, $userName, self::OBJECT_TYPE_USER);
+    }
+
+    public function grantSelectOnAllTablesInSchemaToRole(string $schemaName, string $role): void
+    {
+        $this->query(
+            $this->queryBuilder->grantSelectOnAllTablesInSchemaToRole($schemaName, $role)
+        );
+    }
+
+    private function grantToObjectTypeOnObjectType(
+        string $grantOnObjectType,
+        string $grantOnName,
+        string $granteeObjectType,
+        string $grantToName,
+        array $grant
+    ): void {
+        $this->query(
+            $this->queryBuilder->grantToObjectTypeOnObjectType(
+                $grantOnObjectType,
+                $grantOnName,
+                $granteeObjectType,
+                $grantToName,
+                $grant
+            )
+        );
+    }
+
+    private function grantToObjectTypeOnAllObjectTypesInSchema(
+        string $grantOnObjectType,
+        string $schemaName,
+        string $granteeObjectType,
+        string $grantToName,
+        array $grant
+    ): void {
+        $this->query(
+            $this->queryBuilder->grantToObjectTypeOnAllObjectTypesInSchema(
+                $grantOnObjectType,
+                $schemaName,
+                $granteeObjectType,
+                $grantToName,
+                $grant
+            )
+        );
+    }
+
+    public function grantOnAllObjectTypesInSchemaToRole(
+        string $grantOnObjectType,
+        string $schemaName,
+        string $roleName,
+        array $grant
+    ): void {
+        $this->grantToObjectTypeOnAllObjectTypesInSchema(
+            $grantOnObjectType,
+            $schemaName,
+            self::OBJECT_TYPE_ROLE,
+            $roleName,
+            $grant
+        );
+    }
+
+    /**
+     * @deprecated use QueryBuilder::quote instead
+     */
+    // phpcs:ignore SlevomatCodingStandard.TypeHints.TypeHintDeclaration.UselessDocComment
+    public function quote(string $value): string
+    {
+        return QueryBuilder::quote($value);
+    }
+
+    private function revokeRoleFromObjectType(
+        string $grantedRole,
+        string $roleGrantedTo,
+        string $objectTypeGrantedTo
+    ): void {
+        $this->query(
+            $this->queryBuilder->revokeRoleFromObjectType($grantedRole, $roleGrantedTo, $objectTypeGrantedTo)
+        );
+    }
+
+    public function revokeRoleGrantFromRole(string $grantedRole, string $roleGrantedTo): void
+    {
+        $this->revokeRoleFromObjectType($grantedRole, $roleGrantedTo, Connection::OBJECT_TYPE_ROLE);
+    }
+
+    /**
+     * @return mixed[][]
+     */
+    public function showGrantsOfRole(string $role): array
+    {
+        return $this->fetchAll(
+            $this->queryBuilder->showGrantsOfRole($role)
+        );
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function showGrantsToRole(string $role): array
+    {
+        return $this->fetchAll(
+            $this->queryBuilder->showGrantsToRole($role)
+        );
+    }
+
+    public function getCurrentRole(): string
+    {
+        $res = $this->fetchAll($this->queryBuilder->currentRole());
+        return $res[0]['name'];
     }
 }
