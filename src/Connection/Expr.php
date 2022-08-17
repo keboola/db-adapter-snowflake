@@ -6,8 +6,7 @@ namespace Keboola\SnowflakeDbAdapter\Connection;
 
 class Expr
 {
-    /** @var string */
-    private $value;
+    private string $value;
 
     public function __construct(
         string $value

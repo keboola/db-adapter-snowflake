@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Keboola\SnowflakeDbAdapter;
 
 use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
+use Throwable;
 
 class Connection
 {
@@ -13,8 +14,7 @@ class Connection
      */
     private $connection;
 
-    /** @var QueryBuilder */
-    private $queryBuilder;
+    private QueryBuilder $queryBuilder;
 
     /**
      * The connection constructor accepts the following options:
@@ -124,7 +124,7 @@ class Connection
                     ];
                     $this->query("ALTER SESSION SET QUERY_TAG='" . json_encode($queryTag) . "';");
                 }
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // try again if it is a failed rest request
                 if (stristr($e->getMessage(), 'S1000') !== false) {
                     $attemptNumber++;
@@ -211,7 +211,7 @@ class Connection
             $stmt = odbc_prepare($this->connection, $sql);
             odbc_execute($stmt, $this->repairBinding($bind));
             odbc_free_result($stmt);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             (new ExceptionHandler())->handleException($e, $sql);
         }
     }
@@ -226,7 +226,7 @@ class Connection
                 $rows[] = $row;
             }
             odbc_free_result($stmt);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             (new ExceptionHandler())->handleException($e, $sql);
         }
         return $rows;
@@ -241,7 +241,7 @@ class Connection
                 $callback($row);
             }
             odbc_free_result($stmt);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             (new ExceptionHandler())->handleException($e, $sql);
         }
     }

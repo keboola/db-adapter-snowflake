@@ -1,0 +1,112 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Method Keboola\\\\SnowflakeDbAdapter\\\\Connection\\:\\:__construct\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Connection.php
+
+		-
+			message: "#^Method Keboola\\\\SnowflakeDbAdapter\\\\Connection\\:\\:describeTable\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Connection.php
+
+		-
+			message: "#^Method Keboola\\\\SnowflakeDbAdapter\\\\Connection\\:\\:describeTableColumns\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Connection.php
+
+		-
+			message: "#^Method Keboola\\\\SnowflakeDbAdapter\\\\Connection\\:\\:fetch\\(\\) has parameter \\$bind with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Connection.php
+
+		-
+			message: "#^Method Keboola\\\\SnowflakeDbAdapter\\\\Connection\\:\\:fetchAll\\(\\) has parameter \\$bind with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Connection.php
+
+		-
+			message: "#^Method Keboola\\\\SnowflakeDbAdapter\\\\Connection\\:\\:fetchAll\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Connection.php
+
+		-
+			message: "#^Method Keboola\\\\SnowflakeDbAdapter\\\\Connection\\:\\:getTableColumns\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Connection.php
+
+		-
+			message: "#^Method Keboola\\\\SnowflakeDbAdapter\\\\Connection\\:\\:getTablePrimaryKey\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Connection.php
+
+		-
+			message: "#^Method Keboola\\\\SnowflakeDbAdapter\\\\Connection\\:\\:query\\(\\) has parameter \\$bind with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Connection.php
+
+		-
+			message: "#^Method Keboola\\\\SnowflakeDbAdapter\\\\Connection\\:\\:repairBinding\\(\\) has parameter \\$bind with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Connection.php
+
+		-
+			message: "#^Method Keboola\\\\SnowflakeDbAdapter\\\\Connection\\:\\:repairBinding\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Connection.php
+
+		-
+			message: "#^Parameter \\#1 \\$statement of function odbc_execute expects resource, resource\\|false given\\.$#"
+			count: 3
+			path: src/Connection.php
+
+		-
+			message: "#^Parameter \\#1 \\$statement of function odbc_fetch_array expects resource, resource\\|false given\\.$#"
+			count: 2
+			path: src/Connection.php
+
+		-
+			message: "#^Parameter \\#1 \\$statement of function odbc_free_result expects resource, resource\\|false given\\.$#"
+			count: 3
+			path: src/Connection.php
+
+		-
+			message: "#^Property Keboola\\\\SnowflakeDbAdapter\\\\Connection\\:\\:\\$connection \\(resource\\) does not accept resource\\|false\\.$#"
+			count: 1
+			path: src/Connection.php
+
+		-
+			message: "#^Parameter \\#1 \\$resource of function get_resource_type expects resource, mixed given\\.$#"
+			count: 2
+			path: tests/phpunit/ConnectionTest.php
+
+		-
+			message: "#^Method Keboola\\\\SnowflakeDbAdapter\\\\Tests\\\\ExceptionHandlerTest\\:\\:provideExceptions\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: tests/phpunit/ExceptionHandlerTest.php
+
+		-
+			message: "#^Parameter \\#1 \\$exception of method PHPUnit\\\\Framework\\\\TestCase\\:\\:expectException\\(\\) expects class\\-string\\<Throwable\\>, string given\\.$#"
+			count: 1
+			path: tests/phpunit/ExceptionHandlerTest.php
+
+
+		-
+			message: "#^Method Keboola\\\\SnowflakeDbAdapter\\\\Tests\\\\QueryBuilderIntegrationTest\\:\\:provideQuoteIdentifierInput\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: tests/phpunit/QueryBuilderIntegrationTest.php
+
+		-
+			message: "#^Method Keboola\\\\SnowflakeDbAdapter\\\\Tests\\\\QueryBuilderIntegrationTest\\:\\:provideQuoteInput\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: tests/phpunit/QueryBuilderIntegrationTest.php
+
+		-
+			message: "#^Method Keboola\\\\SnowflakeDbAdapter\\\\Tests\\\\QueryBuilderTest\\:\\:provideIdentifierQuotingData\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: tests/phpunit/QueryBuilderTest.php
+
+		-
+			message: "#^Method Keboola\\\\SnowflakeDbAdapter\\\\Tests\\\\QueryBuilderTest\\:\\:provideQuotingData\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: tests/phpunit/QueryBuilderTest.php

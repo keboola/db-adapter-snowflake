@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Keboola\SnowflakeDbAdapter\Exception;
 
-interface ExceptionInterface extends \Throwable
+use Throwable;
+
+interface ExceptionInterface extends Throwable
 {
 
 }
