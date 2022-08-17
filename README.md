@@ -33,3 +33,7 @@ GRANT ALL ON SCHEMA "GHA_SNOWFLAKE_ADAPTER"."GHA_SNOWFLAKE_ADAPTER" TO ROLE "GHA
 ```
 docker-compose run --rm dev composer tests
 ```
+
+## License
+
+MIT licensed, see [LICENSE](./LICENSE) file.
