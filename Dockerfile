@@ -11,8 +11,6 @@ ENV LANGUAGE=en_US.UTF-8
 ENV LANG=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
 
-
-
 WORKDIR /code/
 
 COPY docker/php-prod.ini /usr/local/etc/php/php.ini
@@ -66,9 +64,6 @@ RUN mkdir -p ~/.gnupg \
     && debsig-verify /tmp/snowflake-odbc.deb \
     && gpg --batch --delete-key --yes $SNOWFLAKE_GPG_KEY \
     && dpkg -i /tmp/snowflake-odbc.deb
-
-COPY docker/php-prod.ini /usr/local/etc/php/php.ini
-COPY docker/composer-install.sh /tmp/composer-install.sh
 
 ## Composer - deps always cached unless changed
 # First copy only composer files
