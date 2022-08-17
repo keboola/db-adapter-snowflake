@@ -6,14 +6,12 @@ namespace Keboola\SnowflakeDbAdapter\Tests;
 
 use InvalidArgumentException;
 use Keboola\SnowflakeDbAdapter\Connection;
-use Keboola\SnowflakeDbAdapter\Exception\RuntimeException;
 use Keboola\SnowflakeDbAdapter\QueryBuilder;
 use PHPUnit\Framework\TestCase;
 
 class QueryBuilderIntegrationTest extends TestCase
 {
-    /** @var Connection */
-    private $db;
+    private ?Connection $db = null;
 
     /** @dataProvider provideQuoteInput */
     public function testQuote(string $input): void
@@ -74,25 +72,6 @@ class QueryBuilderIntegrationTest extends TestCase
                 'quoted\\',
             ],
         ];
-    }
-
-    public function testIdentifierCannotContainDoubleQuote(): void
-    {
-//        $this->markTestSkipped('Just to make sure it actually works like this');
-        try {
-            $this->getConnection()->query('SELECT \'a\' as "Double""Quotes"');
-        } catch (\Throwable $e) {
-            $this->assertInstanceOf(RuntimeException::class, $e);
-            $expectedMessage = 'Error "odbc_prepare(): SQL error: '
-                . 'SQL compilation error:' . "\n"
-                . 'syntax error line 1 at position 22 unexpected \'"Quotes"\'., '
-                . 'SQL state 37000 in SQLPrepare" while executing query '
-                . '"SELECT \'a\' as "Double""Quotes""';
-            $this->assertSame(
-                $expectedMessage,
-                $e->getMessage()
-            );
-        }
     }
 
     public function getConnection(): Connection

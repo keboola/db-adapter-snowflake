@@ -3,3 +3,4 @@
 /data
 /composer.lock
 /.env
+/.phpunit.result.cache

@@ -11,16 +11,11 @@ use PHPUnit\Framework\TestCase;
 
 class IntegrationTest extends TestCase
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private Connection $connection;
 
-    /** @var string */
-    private $destSchemaName = 'in.c-tests';
+    private string $destSchemaName = 'in.c-tests';
 
-    /** @var string */
-    private $sourceSchemaName = 'some.tests';
+    private string $sourceSchemaName = 'some.tests';
 
     public function setUp(): void
     {
@@ -185,7 +180,7 @@ class IntegrationTest extends TestCase
             )
         );
         $this->expectException(StringTooLongException::class);
-        $this->expectExceptionMessageRegExp('/cannot be inserted because it\'s bigger than column size/');
+        $this->expectExceptionMessageMatches('/cannot be inserted because it\'s bigger than column size/');
         $connection->query(
             sprintf(
                 'INSERT INTO "%s"."%s" VALUES(\'%s\');',

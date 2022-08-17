@@ -8,10 +8,7 @@ use Keboola\SnowflakeDbAdapter\Connection\Expr;
 
 class QueryBuilder
 {
-    /**
-     * @param string|Expr $value
-     */
-    public static function quote($value): string
+    public static function quote(string|Expr $value): string
     {
         if ($value instanceof Expr) {
             return $value->getValue();
@@ -20,10 +17,7 @@ class QueryBuilder
         return $q . addslashes($value) . $q;
     }
 
-    /**
-     * @param string|Expr $value
-     */
-    public static function quoteIdentifier($value): string
+    public static function quoteIdentifier(string|Expr $value): string
     {
         if ($value instanceof Expr) {
             return $value->getValue();

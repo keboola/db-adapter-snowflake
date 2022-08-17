@@ -11,8 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class QueryBuilderTest extends TestCase
 {
-    /** @var QueryBuilder */
-    private $queryBuilder;
+    private QueryBuilder $queryBuilder;
 
     protected function setUp(): void
     {
@@ -57,9 +56,8 @@ class QueryBuilderTest extends TestCase
 
     /**
      * @dataProvider provideQuotingData
-     * @param string|Expr $input
      */
-    public function testQuoting(string $expected, $input): void
+    public function testQuoting(string $expected, string|Expr $input): void
     {
         $this->assertSame($expected, QueryBuilder::quote($input));
     }
@@ -80,9 +78,8 @@ class QueryBuilderTest extends TestCase
 
     /**
      * @dataProvider provideIdentifierQuotingData
-     * @param string|Expr $input
      */
-    public function testIdentifierQuoting(string $expected, $input): void
+    public function testIdentifierQuoting(string $expected, string|Expr $input): void
     {
         $this->assertSame($expected, QueryBuilder::quoteIdentifier($input));
     }

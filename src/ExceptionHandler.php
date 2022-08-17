@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace Keboola\SnowflakeDbAdapter;
 
 use Keboola\SnowflakeDbAdapter\Exception\CannotAccessObjectException;
-use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
-use Keboola\SnowflakeDbAdapter\Exception\RuntimeException;
 use Keboola\SnowflakeDbAdapter\Exception\ExceptionInterface;
+use Keboola\SnowflakeDbAdapter\Exception\RuntimeException;
+use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
 use Keboola\SnowflakeDbAdapter\Exception\StringTooLongException;
 use Keboola\SnowflakeDbAdapter\Exception\WarehouseTimeoutReached;
+use Throwable;
 
 class ExceptionHandler
 {
-    public function handleException(\Throwable $e, ?string $sql = null): void
+    public function handleException(Throwable $e, ?string $sql = null): void
     {
         $pattern = "/String \'([^\']*)\' is too long .* SQL state 22000/";
         $matches = null;
