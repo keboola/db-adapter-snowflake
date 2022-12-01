@@ -62,6 +62,7 @@ class Connection
             'warehouse',
             'runId',
             'clientSessionKeepAlive',
+            'application',
         ];
 
         $missingOptions = array_diff($requiredOptions, array_keys($options));
@@ -104,6 +105,10 @@ class Connection
 
         if (isset($options['warehouse'])) {
             $dsn .= ';Warehouse=' . QueryBuilder::quoteIdentifier($options['warehouse']);
+        }
+
+        if (isset($options['application'])) {
+            $dsn .= ';application=' . QueryBuilder::quoteIdentifier($options['application']);
         }
 
         if (isset($options['clientSessionKeepAlive']) && $options['clientSessionKeepAlive']) {
