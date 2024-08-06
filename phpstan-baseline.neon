@@ -56,21 +56,6 @@ parameters:
 			path: src/Connection.php
 
 		-
-			message: "#^Parameter \\#1 \\$statement of function odbc_execute expects resource, resource\\|false given\\.$#"
-			count: 3
-			path: src/Connection.php
-
-		-
-			message: "#^Parameter \\#1 \\$statement of function odbc_fetch_array expects resource, resource\\|false given\\.$#"
-			count: 2
-			path: src/Connection.php
-
-		-
-			message: "#^Parameter \\#1 \\$statement of function odbc_free_result expects resource, resource\\|false given\\.$#"
-			count: 3
-			path: src/Connection.php
-
-		-
 			message: "#^Property Keboola\\\\SnowflakeDbAdapter\\\\Connection\\:\\:\\$connection \\(resource\\) does not accept resource\\|false\\.$#"
 			count: 1
 			path: src/Connection.php
@@ -89,7 +74,6 @@ parameters:
 			message: "#^Parameter \\#1 \\$exception of method PHPUnit\\\\Framework\\\\TestCase\\:\\:expectException\\(\\) expects class\\-string\\<Throwable\\>, string given\\.$#"
 			count: 1
 			path: tests/phpunit/ExceptionHandlerTest.php
-
 
 		-
 			message: "#^Method Keboola\\\\SnowflakeDbAdapter\\\\Tests\\\\QueryBuilderIntegrationTest\\:\\:provideQuoteIdentifierInput\\(\\) return type has no value type specified in iterable type array\\.$#"

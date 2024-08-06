@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Keboola\SnowflakeDbAdapter\Tests;
 
 use Keboola\SnowflakeDbAdapter\Connection;
+use Keboola\SnowflakeDbAdapter\Exception\RuntimeException;
 use Keboola\SnowflakeDbAdapter\Exception\StringTooLongException;
 use Keboola\SnowflakeDbAdapter\Exception\WarehouseTimeoutReached;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Util\ErrorHandler;
 
 class IntegrationTest extends TestCase
 {
@@ -233,5 +235,32 @@ class IntegrationTest extends TestCase
     {
         $connection->query(sprintf('DROP SCHEMA IF EXISTS "%s"', $schemaName));
         $connection->query(sprintf('CREATE SCHEMA "%s"', $schemaName));
+    }
+
+    public function testInvalidTableQuery(): void
+    {
+        $connection = new Connection([
+            'host' => getenv('SNOWFLAKE_HOST'),
+            'user' => getenv('SNOWFLAKE_USER'),
+            'password' => getenv('SNOWFLAKE_PASSWORD'),
+            'database' => getenv('SNOWFLAKE_DATABASE'),
+            'schema' => $this->sourceSchemaName,
+            'warehouse' => getenv('SNOWFLAKE_WAREHOUSE'),
+        ]);
+
+        try {
+            ErrorHandler::invokeIgnoringWarnings(
+                fn() => $connection->fetchAll('SELECT * FROM "testTable"'),
+            );
+        } catch (RuntimeException $e) {
+            $expectedMessage = <<<MSG
+            Error "Failed to prepare statement: SQL compilation error:
+            Object '"testTable"' does not exist or not authorized." while executing query "SELECT * FROM "testTable""
+            MSG;
+            $this->assertSame(
+                $expectedMessage,
+                $e->getMessage(),
+            );
+        }
     }
 }
