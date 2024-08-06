@@ -98,6 +98,7 @@ class IntegrationTest extends TestCase
             'expression' => '',
             'comment' => 'SomeComment',
             'autoincrement' => '',
+            'schema_evolution_record' => null,
         ];
         unset($columnsMetadata[0]['database_name']);
         $this->assertSame($expectedFirstColumn, $columnsMetadata[0]);
