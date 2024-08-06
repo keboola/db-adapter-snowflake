@@ -50,6 +50,7 @@ RUN set -ex; \
 ## install snowflake drivers
 ADD docker/snowflake/generic.pol /etc/debsig/policies/$SNOWFLAKE_GPG_KEY/generic.pol
 ADD docker/snowflake/simba.snowflake.ini /usr/lib/snowflake/odbc/lib/simba.snowflake.ini
+ADD ./docker/snowflake/odbcinst.ini /etc/odbcinst.ini
 
 # snowflake - charset settings
 RUN mkdir -p ~/.gnupg \
