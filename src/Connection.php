@@ -36,7 +36,6 @@ class Connection
      * - clientSessionKeepAlive (bool) - Parameter that indicates whether to force a user
      * to log in again after a period of inactivity in the session
      *
-     * @param array $options
      */
     public function __construct(array $options)
     {
@@ -137,14 +136,14 @@ class Connection
                         throw new SnowflakeDbAdapterException(
                             'Initializing Snowflake connection failed: ' . $e->getMessage(),
                             0,
-                            $e
+                            $e,
                         );
                     }
                 } else {
                     throw new SnowflakeDbAdapterException(
                         'Initializing Snowflake connection failed: ' . $e->getMessage(),
                         0,
-                        $e
+                        $e,
                     );
                 }
             }
@@ -253,8 +252,6 @@ class Connection
 
     /**
      * Avoid odbc file open http://php.net/manual/en/function.odbc-execute.php
-     * @param array $bind
-     * @return array
      */
     private function repairBinding(array $bind): array
     {

@@ -25,8 +25,8 @@ class QueryBuilderTest extends TestCase
             $expected,
             $this->queryBuilder->describeTable(
                 'schema"na\'me',
-                'table"na\'me'
-            )
+                'table"na\'me',
+            ),
         );
     }
 
@@ -37,8 +37,8 @@ class QueryBuilderTest extends TestCase
             $expected,
             $this->queryBuilder->showTableInSchema(
                 'schema"na\'me',
-                'table"na\'me'
-            )
+                'table"na\'me',
+            ),
         );
     }
 
@@ -49,8 +49,8 @@ class QueryBuilderTest extends TestCase
             $expected,
             $this->queryBuilder->showColumns(
                 'schema"na\'me',
-                'table"na\'me'
-            )
+                'table"na\'me',
+            ),
         );
     }
 

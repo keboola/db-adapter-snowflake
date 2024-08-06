@@ -59,7 +59,7 @@ class IntegrationTest extends TestCase
         $connection->fetch(sprintf(
             'SELECT * FROM %s.%s',
             $connection->quoteIdentifier($this->destSchemaName),
-            $connection->quoteIdentifier('bigData')
+            $connection->quoteIdentifier('bigData'),
         ), [], $callback);
         $this->assertEquals($generateRowsCount, $results['count']);
     }
@@ -73,7 +73,7 @@ class IntegrationTest extends TestCase
                 \"col2\" varchar(255)
             )",
             $this->destSchemaName,
-            $destTableName
+            $destTableName,
         ));
         $table = $this->connection->describeTable($this->destSchemaName, $destTableName);
         $this->assertEquals($destTableName, $table['name']);
@@ -131,7 +131,7 @@ class IntegrationTest extends TestCase
                 "_timestamp" TIMESTAMP_NTZ,
                 PRIMARY KEY("id")
             )',
-            $this->destSchemaName
+            $this->destSchemaName,
         ));
     }
 
@@ -154,7 +154,7 @@ class IntegrationTest extends TestCase
         $this->prepareSchema($connection, $destSchemaName);
         $connection->query('CREATE TABLE "' . $destSchemaName . '"."TEST" (col1 varchar, col2 varchar)');
         $connection->query(
-            'INSERT INTO  "' . $destSchemaName . '"."TEST" VALUES (\'šperky.cz\', \'módní doplňky.cz\')'
+            'INSERT INTO  "' . $destSchemaName . '"."TEST" VALUES (\'šperky.cz\', \'módní doplňky.cz\')',
         );
         $data = $connection->fetchAll('SELECT * FROM "' . $destSchemaName . '"."TEST"');
         $this->assertEquals([
@@ -176,8 +176,8 @@ class IntegrationTest extends TestCase
                 'CREATE TABLE "%s"."%s" ("col1" varchar(%d));',
                 $destSchemaName,
                 'TEST',
-                $size
-            )
+                $size,
+            ),
         );
         $this->expectException(StringTooLongException::class);
         $this->expectExceptionMessageMatches('/cannot be inserted because it\'s bigger than column size/');
@@ -186,8 +186,8 @@ class IntegrationTest extends TestCase
                 'INSERT INTO "%s"."%s" VALUES(\'%s\');',
                 $destSchemaName,
                 'TEST',
-                implode('', array_fill(0, $size + 1, 'x'))
-            )
+                implode('', array_fill(0, $size + 1, 'x')),
+            ),
         );
     }
 
@@ -219,13 +219,13 @@ class IntegrationTest extends TestCase
         //tests if you set schema in constructor it really set in connection
         $this->assertSame(
             $this->sourceSchemaName,
-            $connection->fetchAll('SELECT CURRENT_SCHEMA()')[0]['CURRENT_SCHEMA()']
+            $connection->fetchAll('SELECT CURRENT_SCHEMA()')[0]['CURRENT_SCHEMA()'],
         );
 
         //main connection has still different schema
         $this->assertSame(
             $this->destSchemaName,
-            $this->connection->fetchAll('SELECT CURRENT_SCHEMA()')[0]['CURRENT_SCHEMA()']
+            $this->connection->fetchAll('SELECT CURRENT_SCHEMA()')[0]['CURRENT_SCHEMA()'],
         );
     }
 

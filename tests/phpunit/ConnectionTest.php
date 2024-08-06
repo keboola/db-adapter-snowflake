@@ -41,8 +41,8 @@ class ConnectionTest extends TestCase
         $this->expectExceptionMessage(
             sprintf(
                 'Cannot access object or it does not exist. Executing query "USE DATABASE %s"',
-                QueryBuilder::quoteIdentifier($invalidDatabase)
-            )
+                QueryBuilder::quoteIdentifier($invalidDatabase),
+            ),
         );
         $connection->query(sprintf('USE DATABASE %s', QueryBuilder::quoteIdentifier($invalidDatabase)));
     }
@@ -62,8 +62,8 @@ class ConnectionTest extends TestCase
         $this->expectExceptionMessage(
             sprintf(
                 'Cannot access object or it does not exist. Executing query "USE SCHEMA %s"',
-                QueryBuilder::quoteIdentifier($invalidSchema)
-            )
+                QueryBuilder::quoteIdentifier($invalidSchema),
+            ),
         );
         $connection->query(sprintf('USE SCHEMA %s', QueryBuilder::quoteIdentifier($invalidSchema)));
     }
@@ -132,7 +132,7 @@ class ConnectionTest extends TestCase
                 WHERE QUERY_TEXT = \'SELECT current_date;\' 
                 ORDER BY START_TIME DESC 
                 LIMIT 1
-            '
+            ',
         );
 
         $this->assertEquals('{"runId":"runIdValue"}', $queries[0]['QUERY_TAG']);
