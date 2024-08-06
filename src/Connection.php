@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\SnowflakeDbAdapter;
 
+use Keboola\SnowflakeDbAdapter\Exception\RuntimeException;
 use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
 use Throwable;
 
@@ -36,7 +37,6 @@ class Connection
      * - clientSessionKeepAlive (bool) - Parameter that indicates whether to force a user
      * to log in again after a period of inactivity in the session
      *
-     * @param array $options
      */
     public function __construct(array $options)
     {
@@ -137,14 +137,14 @@ class Connection
                         throw new SnowflakeDbAdapterException(
                             'Initializing Snowflake connection failed: ' . $e->getMessage(),
                             0,
-                            $e
+                            $e,
                         );
                     }
                 } else {
                     throw new SnowflakeDbAdapterException(
                         'Initializing Snowflake connection failed: ' . $e->getMessage(),
                         0,
-                        $e
+                        $e,
                     );
                 }
             }
@@ -213,7 +213,7 @@ class Connection
     public function query(string $sql, array $bind = []): void
     {
         try {
-            $stmt = odbc_prepare($this->connection, $sql);
+            $stmt = $this->prepareStatement($sql);
             odbc_execute($stmt, $this->repairBinding($bind));
             odbc_free_result($stmt);
         } catch (Throwable $e) {
@@ -225,7 +225,7 @@ class Connection
     {
         $rows = [];
         try {
-            $stmt = odbc_prepare($this->connection, $sql);
+            $stmt = $this->prepareStatement($sql);
             odbc_execute($stmt, $this->repairBinding($bind));
             while ($row = odbc_fetch_array($stmt)) {
                 $rows[] = $row;
@@ -240,7 +240,7 @@ class Connection
     public function fetch(string $sql, array $bind, callable $callback): void
     {
         try {
-            $stmt = odbc_prepare($this->connection, $sql);
+            $stmt = $this->prepareStatement($sql);
             odbc_execute($stmt, $this->repairBinding($bind));
             while ($row = odbc_fetch_array($stmt)) {
                 $callback($row);
@@ -253,8 +253,6 @@ class Connection
 
     /**
      * Avoid odbc file open http://php.net/manual/en/function.odbc-execute.php
-     * @param array $bind
-     * @return array
      */
     private function repairBinding(array $bind): array
     {
@@ -272,5 +270,17 @@ class Connection
         if (is_resource($this->connection)) {
             odbc_close($this->connection);
         }
+    }
+
+    /**
+     * @return resource
+     */
+    public function prepareStatement(string $sql)
+    {
+        $stmt = odbc_prepare($this->connection, $sql);
+        if ($stmt === false) {
+            throw new RuntimeException('Failed to prepare statement: ' . odbc_errormsg($this->connection));
+        }
+        return $stmt;
     }
 }

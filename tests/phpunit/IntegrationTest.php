@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Keboola\SnowflakeDbAdapter\Tests;
 
 use Keboola\SnowflakeDbAdapter\Connection;
+use Keboola\SnowflakeDbAdapter\Exception\RuntimeException;
 use Keboola\SnowflakeDbAdapter\Exception\StringTooLongException;
 use Keboola\SnowflakeDbAdapter\Exception\WarehouseTimeoutReached;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Util\ErrorHandler;
 
 class IntegrationTest extends TestCase
 {
@@ -59,7 +61,7 @@ class IntegrationTest extends TestCase
         $connection->fetch(sprintf(
             'SELECT * FROM %s.%s',
             $connection->quoteIdentifier($this->destSchemaName),
-            $connection->quoteIdentifier('bigData')
+            $connection->quoteIdentifier('bigData'),
         ), [], $callback);
         $this->assertEquals($generateRowsCount, $results['count']);
     }
@@ -73,7 +75,7 @@ class IntegrationTest extends TestCase
                 \"col2\" varchar(255)
             )",
             $this->destSchemaName,
-            $destTableName
+            $destTableName,
         ));
         $table = $this->connection->describeTable($this->destSchemaName, $destTableName);
         $this->assertEquals($destTableName, $table['name']);
@@ -96,6 +98,7 @@ class IntegrationTest extends TestCase
             'expression' => '',
             'comment' => 'SomeComment',
             'autoincrement' => '',
+            'schema_evolution_record' => null,
         ];
         unset($columnsMetadata[0]['database_name']);
         $this->assertSame($expectedFirstColumn, $columnsMetadata[0]);
@@ -131,7 +134,7 @@ class IntegrationTest extends TestCase
                 "_timestamp" TIMESTAMP_NTZ,
                 PRIMARY KEY("id")
             )',
-            $this->destSchemaName
+            $this->destSchemaName,
         ));
     }
 
@@ -154,7 +157,7 @@ class IntegrationTest extends TestCase
         $this->prepareSchema($connection, $destSchemaName);
         $connection->query('CREATE TABLE "' . $destSchemaName . '"."TEST" (col1 varchar, col2 varchar)');
         $connection->query(
-            'INSERT INTO  "' . $destSchemaName . '"."TEST" VALUES (\'šperky.cz\', \'módní doplňky.cz\')'
+            'INSERT INTO  "' . $destSchemaName . '"."TEST" VALUES (\'šperky.cz\', \'módní doplňky.cz\')',
         );
         $data = $connection->fetchAll('SELECT * FROM "' . $destSchemaName . '"."TEST"');
         $this->assertEquals([
@@ -176,8 +179,8 @@ class IntegrationTest extends TestCase
                 'CREATE TABLE "%s"."%s" ("col1" varchar(%d));',
                 $destSchemaName,
                 'TEST',
-                $size
-            )
+                $size,
+            ),
         );
         $this->expectException(StringTooLongException::class);
         $this->expectExceptionMessageMatches('/cannot be inserted because it\'s bigger than column size/');
@@ -186,8 +189,8 @@ class IntegrationTest extends TestCase
                 'INSERT INTO "%s"."%s" VALUES(\'%s\');',
                 $destSchemaName,
                 'TEST',
-                implode('', array_fill(0, $size + 1, 'x'))
-            )
+                implode('', array_fill(0, $size + 1, 'x')),
+            ),
         );
     }
 
@@ -219,13 +222,13 @@ class IntegrationTest extends TestCase
         //tests if you set schema in constructor it really set in connection
         $this->assertSame(
             $this->sourceSchemaName,
-            $connection->fetchAll('SELECT CURRENT_SCHEMA()')[0]['CURRENT_SCHEMA()']
+            $connection->fetchAll('SELECT CURRENT_SCHEMA()')[0]['CURRENT_SCHEMA()'],
         );
 
         //main connection has still different schema
         $this->assertSame(
             $this->destSchemaName,
-            $this->connection->fetchAll('SELECT CURRENT_SCHEMA()')[0]['CURRENT_SCHEMA()']
+            $this->connection->fetchAll('SELECT CURRENT_SCHEMA()')[0]['CURRENT_SCHEMA()'],
         );
     }
 
@@ -233,5 +236,32 @@ class IntegrationTest extends TestCase
     {
         $connection->query(sprintf('DROP SCHEMA IF EXISTS "%s"', $schemaName));
         $connection->query(sprintf('CREATE SCHEMA "%s"', $schemaName));
+    }
+
+    public function testInvalidTableQuery(): void
+    {
+        $connection = new Connection([
+            'host' => getenv('SNOWFLAKE_HOST'),
+            'user' => getenv('SNOWFLAKE_USER'),
+            'password' => getenv('SNOWFLAKE_PASSWORD'),
+            'database' => getenv('SNOWFLAKE_DATABASE'),
+            'schema' => $this->sourceSchemaName,
+            'warehouse' => getenv('SNOWFLAKE_WAREHOUSE'),
+        ]);
+
+        try {
+            ErrorHandler::invokeIgnoringWarnings(
+                fn() => $connection->fetchAll('SELECT * FROM "testTable"'),
+            );
+        } catch (RuntimeException $e) {
+            $expectedMessage = <<<MSG
+            Error "Failed to prepare statement: SQL compilation error:
+            Object '"testTable"' does not exist or not authorized." while executing query "SELECT * FROM "testTable""
+            MSG;
+            $this->assertSame(
+                $expectedMessage,
+                $e->getMessage(),
+            );
+        }
     }
 }

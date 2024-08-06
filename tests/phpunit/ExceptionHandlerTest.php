@@ -24,7 +24,7 @@ class ExceptionHandlerTest extends TestCase
         string $expectedExceptionClass,
         string $expectedExceptionMessage,
         Throwable $thrownException,
-        ?string $sql = null
+        ?string $sql = null,
     ): void {
         $handler = new ExceptionHandler();
         $this->expectException($expectedExceptionClass);

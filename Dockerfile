@@ -50,11 +50,14 @@ RUN set -ex; \
 ## install snowflake drivers
 ADD docker/snowflake/generic.pol /etc/debsig/policies/$SNOWFLAKE_GPG_KEY/generic.pol
 ADD docker/snowflake/simba.snowflake.ini /usr/lib/snowflake/odbc/lib/simba.snowflake.ini
+ADD ./docker/snowflake/odbcinst.ini /etc/odbcinst.ini
 
 # snowflake - charset settings
 RUN mkdir -p ~/.gnupg \
     && chmod 700 ~/.gnupg \
     && echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf \
+    && mkdir -p /etc/gnupg \
+    && echo "allow-weak-digest-algos" >> /etc/gnupg/gpg.conf \
     && mkdir /usr/share/debsig/keyrings/$SNOWFLAKE_GPG_KEY \
     && if ! gpg --keyserver hkp://keys.gnupg.net --recv-keys $SNOWFLAKE_GPG_KEY; then \
         gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys $SNOWFLAKE_GPG_KEY;  \

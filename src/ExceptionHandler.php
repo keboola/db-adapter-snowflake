@@ -22,7 +22,7 @@ class ExceptionHandler
             array_shift($matches); // remove the whole string from matches
             throw new StringTooLongException(vsprintf(
                 "String '%s' cannot be inserted because it's bigger than column size",
-                $matches
+                $matches,
             ));
         }
 
@@ -32,13 +32,13 @@ class ExceptionHandler
             array_shift($matches); // remove the whole string from matches
             throw new WarehouseTimeoutReached(vsprintf(
                 'Query reached its timeout %d second(s)',
-                $matches
+                $matches,
             ));
         }
 
         if ($sql && strpos($e->getMessage(), 'Object does not exist')) {
             throw new CannotAccessObjectException(
-                sprintf('Cannot access object or it does not exist. Executing query "%s"', $sql)
+                sprintf('Cannot access object or it does not exist. Executing query "%s"', $sql),
             );
         }
 
@@ -46,7 +46,7 @@ class ExceptionHandler
             throw new RuntimeException(
                 sprintf('Error "%s" while executing query "%s"', $e->getMessage(), $sql),
                 $e->getCode(),
-                $e
+                $e,
             );
         }
         if ($e instanceof ExceptionInterface) {

@@ -31,7 +31,7 @@ class QueryBuilder
         return sprintf(
             'SHOW TABLES LIKE %s IN SCHEMA %s',
             "'" . addslashes($tableName) . "'",
-            self::quoteIdentifier($schemaName)
+            self::quoteIdentifier($schemaName),
         );
     }
 
@@ -40,7 +40,7 @@ class QueryBuilder
         return sprintf(
             'SHOW COLUMNS IN %s.%s',
             self::quoteIdentifier($schemaName),
-            self::quoteIdentifier($tableName)
+            self::quoteIdentifier($tableName),
         );
     }
 
@@ -49,7 +49,7 @@ class QueryBuilder
         return sprintf(
             'DESC TABLE %s.%s',
             self::quoteIdentifier($schemaName),
-            self::quoteIdentifier($tableName)
+            self::quoteIdentifier($tableName),
         );
     }
 }
