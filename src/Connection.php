@@ -277,10 +277,18 @@ class Connection
      */
     public function prepareStatement(string $sql)
     {
+        // convert warning to exception
+        $oldErrorReporting = error_reporting(E_ALL);
+        set_error_handler(fn($errno, $errstr, $errfile): bool => throw new RuntimeException($errstr, $errno));
+
         $stmt = odbc_prepare($this->connection, $sql);
-        if ($stmt === false) {
-            throw new RuntimeException('Failed to prepare statement: ' . odbc_errormsg($this->connection));
-        }
+
+        // restore previous error handler
+        error_reporting($oldErrorReporting);
+        restore_error_handler();
+
+        assert($stmt !== false, 'It should have thrown an exception');
+
         return $stmt;
     }
 }

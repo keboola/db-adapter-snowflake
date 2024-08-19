@@ -9,7 +9,6 @@ use Keboola\SnowflakeDbAdapter\Exception\RuntimeException;
 use Keboola\SnowflakeDbAdapter\Exception\StringTooLongException;
 use Keboola\SnowflakeDbAdapter\Exception\WarehouseTimeoutReached;
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Util\ErrorHandler;
 
 class IntegrationTest extends TestCase
 {
@@ -250,14 +249,15 @@ class IntegrationTest extends TestCase
         ]);
 
         try {
-            ErrorHandler::invokeIgnoringWarnings(
-                fn() => $connection->fetchAll('SELECT * FROM "testTable"'),
-            );
+            $connection->fetchAll('SELECT * FROM "testTable"');
+            $this->fail('Exception should be thrown');
         } catch (RuntimeException $e) {
-            $expectedMessage = <<<MSG
-            Error "Failed to prepare statement: SQL compilation error:
-            Object '"testTable"' does not exist or not authorized." while executing query "SELECT * FROM "testTable""
-            MSG;
+            // phpcs:disable Generic.Files.LineLength.MaxExceeded
+            $expectedMessage = <<<'ERROR'
+            Error "odbc_prepare(): SQL error: SQL compilation error:
+            Object '"testTable"' does not exist or not authorized., SQL state S0002 in SQLPrepare" while executing query "SELECT * FROM "testTable""
+            ERROR;
+            // phpcs:enable
             $this->assertSame(
                 $expectedMessage,
                 $e->getMessage(),
