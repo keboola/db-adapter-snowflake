@@ -214,7 +214,7 @@ class Connection
     {
         try {
             $stmt = $this->prepareStatement($sql);
-            odbc_execute($stmt, $this->repairBinding($bind));
+            $this->executeStatement($stmt, $bind);
             odbc_free_result($stmt);
         } catch (Throwable $e) {
             (new ExceptionHandler())->handleException($e, $sql);
@@ -226,7 +226,7 @@ class Connection
         $rows = [];
         try {
             $stmt = $this->prepareStatement($sql);
-            odbc_execute($stmt, $this->repairBinding($bind));
+            $this->executeStatement($stmt, $bind);
             while ($row = odbc_fetch_array($stmt)) {
                 $rows[] = $row;
             }
@@ -241,7 +241,7 @@ class Connection
     {
         try {
             $stmt = $this->prepareStatement($sql);
-            odbc_execute($stmt, $this->repairBinding($bind));
+            $this->executeStatement($stmt, $bind);
             while ($row = odbc_fetch_array($stmt)) {
                 $callback($row);
             }
@@ -290,5 +290,22 @@ class Connection
         assert($stmt !== false, 'It should have thrown an exception');
 
         return $stmt;
+    }
+
+    /**
+     * @param resource $stmt
+     * @param mixed[] $bind
+     */
+    public function executeStatement($stmt, array $bind): void
+    {
+        // convert warning to exception
+        $oldErrorReporting = error_reporting(E_ALL);
+        set_error_handler(fn($errno, $errstr, $errfile): bool => throw new RuntimeException($errstr, $errno));
+
+        $result = odbc_execute($stmt, $this->repairBinding($bind));
+
+        // restore previous error handler
+        error_reporting($oldErrorReporting);
+        restore_error_handler();
     }
 }

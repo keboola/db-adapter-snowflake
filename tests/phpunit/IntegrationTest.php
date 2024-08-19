@@ -264,4 +264,37 @@ class IntegrationTest extends TestCase
             );
         }
     }
+
+    public function testRuntimeError(): void
+    {
+        $connection = new Connection([
+            'host' => getenv('SNOWFLAKE_HOST'),
+            'user' => getenv('SNOWFLAKE_USER'),
+            'password' => getenv('SNOWFLAKE_PASSWORD'),
+            'database' => getenv('SNOWFLAKE_DATABASE'),
+            'schema' => $this->sourceSchemaName,
+            'warehouse' => getenv('SNOWFLAKE_WAREHOUSE'),
+        ]);
+
+        $connection->query('CREATE TABLE "testTable" (col1 number(10))');
+
+        $string = 'lorem ipsum';
+        $query = <<<SQL
+            INSERT INTO "testTable" VALUES ('${string}')
+            SQL;
+        try {
+            $connection->query($query);
+            $this->fail('Exception should be thrown');
+        } catch (RuntimeException $e) {
+            // phpcs:disable Generic.Files.LineLength.MaxExceeded
+            $expectedMessage = <<<'ERROR'
+            Error "odbc_execute(): SQL error: Numeric value 'lorem ipsum' is not recognized, SQL state 22005 in SQLExecute" while executing query "INSERT INTO "testTable" VALUES ('lorem ipsum')"
+            ERROR;
+            // phpcs:enable
+            $this->assertSame(
+                $expectedMessage,
+                $e->getMessage(),
+            );
+        }
+    }
 }
