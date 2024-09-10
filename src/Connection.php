@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Keboola\SnowflakeDbAdapter;
 
-use Keboola\SnowflakeDbAdapter\Exception\RuntimeException;
 use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
 use Throwable;
 
@@ -213,7 +212,7 @@ class Connection
     public function query(string $sql, array $bind = []): void
     {
         try {
-            $stmt = $this->prepareStatement($sql);
+            $stmt = odbc_prepare($this->connection, $sql);
             odbc_execute($stmt, $this->repairBinding($bind));
             odbc_free_result($stmt);
         } catch (Throwable $e) {
@@ -225,7 +224,7 @@ class Connection
     {
         $rows = [];
         try {
-            $stmt = $this->prepareStatement($sql);
+            $stmt = odbc_prepare($this->connection, $sql);
             odbc_execute($stmt, $this->repairBinding($bind));
             while ($row = odbc_fetch_array($stmt)) {
                 $rows[] = $row;
@@ -240,7 +239,7 @@ class Connection
     public function fetch(string $sql, array $bind, callable $callback): void
     {
         try {
-            $stmt = $this->prepareStatement($sql);
+            $stmt = odbc_prepare($this->connection, $sql);
             odbc_execute($stmt, $this->repairBinding($bind));
             while ($row = odbc_fetch_array($stmt)) {
                 $callback($row);
@@ -270,17 +269,5 @@ class Connection
         if (is_resource($this->connection)) {
             odbc_close($this->connection);
         }
-    }
-
-    /**
-     * @return resource
-     */
-    public function prepareStatement(string $sql)
-    {
-        $stmt = odbc_prepare($this->connection, $sql);
-        if ($stmt === false) {
-            throw new RuntimeException('Failed to prepare statement: ' . odbc_errormsg($this->connection));
-        }
-        return $stmt;
     }
 }
