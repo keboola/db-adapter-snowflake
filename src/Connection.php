@@ -16,6 +16,9 @@ class Connection
 
     private QueryBuilder $queryBuilder;
 
+    /** @var array<string, string> */
+    private array $options;
+
     /**
      * The connection constructor accepts the following options:
      * - host (string, required) - hostname
@@ -75,55 +78,8 @@ class Connection
             throw new SnowflakeDbAdapterException('Unknown options: ' . implode(', ', $unknownOptions));
         }
 
-        $port = isset($options['port']) ? (int) $options['port'] : 443;
-        $tracing = isset($options['tracing']) ? (int) $options['tracing'] : 0;
+        $this->options = $options;
         $maxBackoffAttempts = isset($options['maxBackoffAttempts']) ? (int) $options['maxBackoffAttempts'] : 5;
-
-        $dsn = 'Driver=SnowflakeDSIIDriver;Server=' . $options['host'];
-        $dsn .= ';Port=' . $port;
-        $dsn .= ';Tracing=' . $tracing;
-
-        if (isset($options['loginTimeout'])) {
-            $dsn .= ';Login_timeout=' . (int) $options['loginTimeout'];
-        }
-
-        if (isset($options['networkTimeout'])) {
-            $dsn .= ';Network_timeout=' . (int) $options['networkTimeout'];
-        }
-
-        if (isset($options['queryTimeout'])) {
-            $dsn .= ';Query_timeout=' . (int) $options['queryTimeout'];
-        }
-
-        if (isset($options['database'])) {
-            $dsn .= ';Database=' . QueryBuilder::quoteIdentifier($options['database']);
-        }
-
-        if (isset($options['schema'])) {
-            $dsn .= ';Schema=' . $this->quoteIdentifier($options['schema']);
-        }
-
-        if (isset($options['warehouse'])) {
-            $dsn .= ';Warehouse=' . QueryBuilder::quoteIdentifier($options['warehouse']);
-        }
-
-        if (isset($options['application'])) {
-            $dsn .= ';application=' . QueryBuilder::quoteIdentifier($options['application']);
-        }
-
-        if (isset($options['clientSessionKeepAlive']) && $options['clientSessionKeepAlive']) {
-            $dsn .= ';CLIENT_SESSION_KEEP_ALIVE=TRUE';
-        }
-
-        if (isset($options['roleName'])) {
-            $dsn .= ';Role=' . QueryBuilder::quoteIdentifier($options['roleName']);
-        }
-
-        if (isset($options['keyPairPath'])) {
-            $dsn .= ';AUTHENTICATOR=SNOWFLAKE_JWT';
-            $dsn .= ';PRIV_KEY_FILE=' . $options['keyPairPath'];
-            $dsn .= ';UID=' . $options['user'];
-        }
 
         $attemptNumber = 0;
         do {
@@ -131,7 +87,7 @@ class Connection
                 sleep(pow(2, $attemptNumber));
             }
             try {
-                $this->connection = odbc_connect($dsn, $options['user'], $options['password']);
+                $this->connection = odbc_connect($this->buildDsn(), $options['user'], $options['password']);
 
                 if (isset($options['runId'])) {
                     $queryTag = [
@@ -164,6 +120,60 @@ class Connection
     public function __destruct()
     {
         $this->disconnect();
+    }
+
+    public function buildDsn(): string
+    {
+        $port = isset($this->options['port']) ? (int) $this->options['port'] : 443;
+        $tracing = isset($this->options['tracing']) ? (int) $this->options['tracing'] : 0;
+
+        $dsn = 'Driver=SnowflakeDSIIDriver;Server=' . $this->options['host'];
+        $dsn .= ';Port=' . $port;
+        $dsn .= ';Tracing=' . $tracing;
+
+        if (isset($this->options['loginTimeout'])) {
+            $dsn .= ';Login_timeout=' . (int) $this->options['loginTimeout'];
+        }
+
+        if (isset($this->options['networkTimeout'])) {
+            $dsn .= ';Network_timeout=' . (int) $this->options['networkTimeout'];
+        }
+
+        if (isset($this->options['queryTimeout'])) {
+            $dsn .= ';Query_timeout=' . (int) $this->options['queryTimeout'];
+        }
+
+        if (isset($this->options['database'])) {
+            $dsn .= ';Database=' . QueryBuilder::quoteIdentifier($this->options['database']);
+        }
+
+        if (isset($this->options['schema'])) {
+            $dsn .= ';Schema=' . $this->quoteIdentifier($this->options['schema']);
+        }
+
+        if (isset($this->options['warehouse'])) {
+            $dsn .= ';Warehouse=' . QueryBuilder::quoteIdentifier($this->options['warehouse']);
+        }
+
+        if (isset($this->options['application'])) {
+            $dsn .= ';application=' . QueryBuilder::quoteIdentifier($this->options['application']);
+        }
+
+        if (isset($this->options['clientSessionKeepAlive']) && $this->options['clientSessionKeepAlive']) {
+            $dsn .= ';CLIENT_SESSION_KEEP_ALIVE=TRUE';
+        }
+
+        if (isset($this->options['roleName'])) {
+            $dsn .= ';Role=' . QueryBuilder::quoteIdentifier($this->options['roleName']);
+        }
+
+        if (isset($this->options['keyPairPath'])) {
+            $dsn .= ';AUTHENTICATOR=SNOWFLAKE_JWT';
+            $dsn .= ';PRIV_KEY_FILE=' . $this->options['keyPairPath'];
+            $dsn .= ';UID=' . $this->options['user'];
+        }
+
+        return $dsn;
     }
 
     /**
