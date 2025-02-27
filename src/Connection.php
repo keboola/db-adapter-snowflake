@@ -43,13 +43,13 @@ class Connection
         $requiredOptions = [
             'host',
             'user',
-            'password',
         ];
 
         $allowedOptions = [
             'host',
             'user',
             'password',
+            'keyPairPath',
             'port',
             'tracing',
             'loginTimeout',
@@ -62,6 +62,7 @@ class Connection
             'runId',
             'clientSessionKeepAlive',
             'application',
+            'roleName',
         ];
 
         $missingOptions = array_diff($requiredOptions, array_keys($options));
@@ -112,6 +113,16 @@ class Connection
 
         if (isset($options['clientSessionKeepAlive']) && $options['clientSessionKeepAlive']) {
             $dsn .= ';CLIENT_SESSION_KEEP_ALIVE=TRUE';
+        }
+
+        if (isset($options['roleName'])) {
+            $dsn .= ';Role=' . QueryBuilder::quoteIdentifier($options['roleName']);
+        }
+
+        if (isset($options['keyPairPath'])) {
+            $dsn .= ';AUTHENTICATOR=SNOWFLAKE_JWT';
+            $dsn .= ';PRIV_KEY_FILE=' . $options['keyPairPath'];
+            $dsn .= ';UID=' . $options['user'];
         }
 
         $attemptNumber = 0;
