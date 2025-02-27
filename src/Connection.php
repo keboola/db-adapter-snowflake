@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\SnowflakeDbAdapter;
 
+use Keboola\SnowflakeDbAdapter\Builder\DSNBuilder;
 use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
 use Throwable;
 
@@ -15,9 +16,6 @@ class Connection
     private $connection;
 
     private QueryBuilder $queryBuilder;
-
-    /** @var array<string, string> */
-    private array $options;
 
     /**
      * The connection constructor accepts the following options:
@@ -43,42 +41,8 @@ class Connection
     public function __construct(array $options)
     {
         $this->queryBuilder = new QueryBuilder();
-        $requiredOptions = [
-            'host',
-            'user',
-        ];
+        $dsn = DSNBuilder::build($options);
 
-        $allowedOptions = [
-            'host',
-            'user',
-            'password',
-            'keyPairPath',
-            'port',
-            'tracing',
-            'loginTimeout',
-            'networkTimeout',
-            'queryTimeout',
-            'maxBackoffAttempts',
-            'database',
-            'schema',
-            'warehouse',
-            'runId',
-            'clientSessionKeepAlive',
-            'application',
-            'roleName',
-        ];
-
-        $missingOptions = array_diff($requiredOptions, array_keys($options));
-        if (!empty($missingOptions)) {
-            throw new SnowflakeDbAdapterException('Missing options: ' . implode(', ', $missingOptions));
-        }
-
-        $unknownOptions = array_diff(array_keys($options), $allowedOptions);
-        if (!empty($unknownOptions)) {
-            throw new SnowflakeDbAdapterException('Unknown options: ' . implode(', ', $unknownOptions));
-        }
-
-        $this->options = $options;
         $maxBackoffAttempts = isset($options['maxBackoffAttempts']) ? (int) $options['maxBackoffAttempts'] : 5;
 
         $attemptNumber = 0;
@@ -87,7 +51,7 @@ class Connection
                 sleep(pow(2, $attemptNumber));
             }
             try {
-                $this->connection = odbc_connect($this->buildDsn(), $options['user'], $options['password']);
+                $this->connection = odbc_connect($dsn, $options['user'], $options['password']);
 
                 if (isset($options['runId'])) {
                     $queryTag = [
@@ -120,60 +84,6 @@ class Connection
     public function __destruct()
     {
         $this->disconnect();
-    }
-
-    public function buildDsn(): string
-    {
-        $port = isset($this->options['port']) ? (int) $this->options['port'] : 443;
-        $tracing = isset($this->options['tracing']) ? (int) $this->options['tracing'] : 0;
-
-        $dsn = 'Driver=SnowflakeDSIIDriver;Server=' . $this->options['host'];
-        $dsn .= ';Port=' . $port;
-        $dsn .= ';Tracing=' . $tracing;
-
-        if (isset($this->options['loginTimeout'])) {
-            $dsn .= ';Login_timeout=' . (int) $this->options['loginTimeout'];
-        }
-
-        if (isset($this->options['networkTimeout'])) {
-            $dsn .= ';Network_timeout=' . (int) $this->options['networkTimeout'];
-        }
-
-        if (isset($this->options['queryTimeout'])) {
-            $dsn .= ';Query_timeout=' . (int) $this->options['queryTimeout'];
-        }
-
-        if (isset($this->options['database'])) {
-            $dsn .= ';Database=' . QueryBuilder::quoteIdentifier($this->options['database']);
-        }
-
-        if (isset($this->options['schema'])) {
-            $dsn .= ';Schema=' . $this->quoteIdentifier($this->options['schema']);
-        }
-
-        if (isset($this->options['warehouse'])) {
-            $dsn .= ';Warehouse=' . QueryBuilder::quoteIdentifier($this->options['warehouse']);
-        }
-
-        if (isset($this->options['application'])) {
-            $dsn .= ';application=' . QueryBuilder::quoteIdentifier($this->options['application']);
-        }
-
-        if (isset($this->options['clientSessionKeepAlive']) && $this->options['clientSessionKeepAlive']) {
-            $dsn .= ';CLIENT_SESSION_KEEP_ALIVE=TRUE';
-        }
-
-        if (isset($this->options['roleName'])) {
-            $dsn .= ';Role=' . QueryBuilder::quoteIdentifier($this->options['roleName']);
-        }
-
-        if (isset($this->options['keyPairPath'])) {
-            $dsn .= ';AUTHENTICATOR=SNOWFLAKE_JWT';
-            $dsn .= ';PRIV_KEY_FILE=' . $this->options['keyPairPath'];
-            $dsn .= ';UID=' . $this->options['user'];
-        }
-
-        return $dsn;
     }
 
     /**
