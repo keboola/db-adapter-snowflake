@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\SnowflakeDbAdapter\Builder;
 
+use Keboola\SnowflakeDbAdapter\Exception\PrivateKeyIsNotValid;
 use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
 use Keboola\SnowflakeDbAdapter\QueryBuilder;
 
@@ -23,7 +24,7 @@ class DSNBuilder
             'host',
             'user',
             'password',
-            'keyPairPath',
+            'keyPair',
             'port',
             'tracing',
             'loginTimeout',
@@ -92,12 +93,28 @@ class DSNBuilder
             $dsn .= ';Role=' . QueryBuilder::quoteIdentifier($options['roleName']);
         }
 
-        if (isset($options['keyPairPath'])) {
+        if (isset($options['keyPair'])) {
             $dsn .= ';AUTHENTICATOR=SNOWFLAKE_JWT';
-            $dsn .= ';PRIV_KEY_FILE=' . $options['keyPairPath'];
+            $dsn .= ';PRIV_KEY_FILE=' . self::getKeyPairPath($options['keyPair']);
             $dsn .= ';UID=' . $options['user'];
         }
 
         return $dsn;
+    }
+
+    private static function getKeyPairPath(string $keyPair): string
+    {
+        $privateKeyResource = openssl_pkey_get_private($keyPair);
+        if (!$privateKeyResource) {
+            throw new PrivateKeyIsNotValid();
+        }
+
+        $pemPKCS8 = '';
+        openssl_pkey_export($privateKeyResource, $pemPKCS8);
+
+        $privateKeyPath = tempnam(sys_get_temp_dir(), 'snowflake_private_key_' . uniqid()) . '.p8';
+        file_put_contents($privateKeyPath, $pemPKCS8);
+
+        return $privateKeyPath;
     }
 }
