@@ -70,12 +70,14 @@ FFdzKwQdMPWGCJTt0KdMw2s=
             'keyPair' => self::PRIVATE_KEY_PAIR,
         ]);
 
+        /** @codingStandardsIgnoreStart */
         self::assertTrue(
             @preg_match(
                 '/^Driver=SnowflakeDSIIDriver;Server=host;Port=443;Tracing=0;Database="database";Warehouse="warehouse";Role="role";AUTHENTICATOR=SNOWFLAKE_JWT;PRIV_KEY_FILE=\/tmp\/snowflake_private_key_([a-zA-Z0-9]*).p8;UID=user$/',
                 $dsn,
             ) === 1,
         );
+        /** @codingStandardsIgnoreEnd */
     }
 
     public function testInvalidKeyPair(): void
