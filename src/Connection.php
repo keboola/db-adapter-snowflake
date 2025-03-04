@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\SnowflakeDbAdapter;
 
+use Keboola\SnowflakeDbAdapter\Builder\DSNBuilder;
 use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
 use Throwable;
 
@@ -40,79 +41,9 @@ class Connection
     public function __construct(array $options)
     {
         $this->queryBuilder = new QueryBuilder();
-        $requiredOptions = [
-            'host',
-            'user',
-            'password',
-        ];
+        $dsn = DSNBuilder::build($options);
 
-        $allowedOptions = [
-            'host',
-            'user',
-            'password',
-            'port',
-            'tracing',
-            'loginTimeout',
-            'networkTimeout',
-            'queryTimeout',
-            'maxBackoffAttempts',
-            'database',
-            'schema',
-            'warehouse',
-            'runId',
-            'clientSessionKeepAlive',
-            'application',
-        ];
-
-        $missingOptions = array_diff($requiredOptions, array_keys($options));
-        if (!empty($missingOptions)) {
-            throw new SnowflakeDbAdapterException('Missing options: ' . implode(', ', $missingOptions));
-        }
-
-        $unknownOptions = array_diff(array_keys($options), $allowedOptions);
-        if (!empty($unknownOptions)) {
-            throw new SnowflakeDbAdapterException('Unknown options: ' . implode(', ', $unknownOptions));
-        }
-
-        $port = isset($options['port']) ? (int) $options['port'] : 443;
-        $tracing = isset($options['tracing']) ? (int) $options['tracing'] : 0;
         $maxBackoffAttempts = isset($options['maxBackoffAttempts']) ? (int) $options['maxBackoffAttempts'] : 5;
-
-        $dsn = 'Driver=SnowflakeDSIIDriver;Server=' . $options['host'];
-        $dsn .= ';Port=' . $port;
-        $dsn .= ';Tracing=' . $tracing;
-
-        if (isset($options['loginTimeout'])) {
-            $dsn .= ';Login_timeout=' . (int) $options['loginTimeout'];
-        }
-
-        if (isset($options['networkTimeout'])) {
-            $dsn .= ';Network_timeout=' . (int) $options['networkTimeout'];
-        }
-
-        if (isset($options['queryTimeout'])) {
-            $dsn .= ';Query_timeout=' . (int) $options['queryTimeout'];
-        }
-
-        if (isset($options['database'])) {
-            $dsn .= ';Database=' . QueryBuilder::quoteIdentifier($options['database']);
-        }
-
-        if (isset($options['schema'])) {
-            $dsn .= ';Schema=' . $this->quoteIdentifier($options['schema']);
-        }
-
-        if (isset($options['warehouse'])) {
-            $dsn .= ';Warehouse=' . QueryBuilder::quoteIdentifier($options['warehouse']);
-        }
-
-        if (isset($options['application'])) {
-            $dsn .= ';application=' . QueryBuilder::quoteIdentifier($options['application']);
-        }
-
-        if (isset($options['clientSessionKeepAlive']) && $options['clientSessionKeepAlive']) {
-            $dsn .= ';CLIENT_SESSION_KEEP_ALIVE=TRUE';
-        }
 
         $attemptNumber = 0;
         do {

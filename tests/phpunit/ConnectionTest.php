@@ -26,6 +26,20 @@ class ConnectionTest extends TestCase
         $this->assertSame('1', $res[0]['result']);
     }
 
+    public function testCanConnectWithKeyPair(): void
+    {
+        $connection = new Connection([
+            'host' => getenv('SNOWFLAKE_HOST'),
+            'user' => getenv('SNOWFLAKE_USER'),
+            'password' => '',
+            'database' => getenv('SNOWFLAKE_DATABASE'),
+            'keyPair' => getenv('SNOWFLAKE_KEYPAIR'),
+        ]);
+
+        $res = $connection->fetchAll('SELECT 1 AS "result"');
+        $this->assertSame('1', $res[0]['result']);
+    }
+
     public function testInvalidAccessToDatabase(): void
     {
         $invalidDatabase = 'invalidDatabase';

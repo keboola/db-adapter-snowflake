@@ -1,6 +1,6 @@
-version: '2'
 services:
   dev:
+    platform: linux/amd64
     build: .
     environment:
       - SNOWFLAKE_HOST
@@ -8,6 +8,7 @@ services:
       - SNOWFLAKE_USER
       - SNOWFLAKE_PASSWORD
       - SNOWFLAKE_WAREHOUSE
+      - SNOWFLAKE_KEYPAIR
     volumes:
       - ./:/code
       - ./data:/data
