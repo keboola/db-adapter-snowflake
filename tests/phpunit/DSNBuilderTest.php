@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class DSNBuilderTest extends TestCase
 {
-    private const PRIVATE_PRIVATE_KEY = '-----BEGIN PRIVATE KEY-----
+    private const PRIVATE_KEY = '-----BEGIN PRIVATE KEY-----
 MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCdA3EDPX6qduHB
 bTejfJkmoIK2xpeWdsawZ3iEqhodFua7eGHWwZ8/qj82/WpweoHgCwQHEHg+CLxR
 zyNufRd5ucsjoEFmB5bpQ98KV51Poa19Bfp6q5tpwFEdsam+SdRChyFX1SYB77cl
@@ -67,7 +67,7 @@ FFdzKwQdMPWGCJTt0KdMw2s=
             'user' => 'user',
             'password' => 'password',
             'roleName' => 'role',
-            'privateKey' => self::PRIVATE_PRIVATE_KEY,
+            'privateKey' => self::PRIVATE_KEY,
         ]);
 
         /** @codingStandardsIgnoreStart */
