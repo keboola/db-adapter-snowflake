@@ -57,7 +57,7 @@ FFdzKwQdMPWGCJTt0KdMw2s=
         );
     }
 
-    public function testBuildDSNWithKeyPair(): void
+    public function testBuildDSNWithPrivateKey(): void
     {
         $dsn = DSNBuilder::build([
             'host' => 'host',
@@ -80,7 +80,7 @@ FFdzKwQdMPWGCJTt0KdMw2s=
         /** @codingStandardsIgnoreEnd */
     }
 
-    public function testInvalidKeyPair(): void
+    public function testInvalidPrivateKey(): void
     {
         self::expectException(PrivateKeyIsNotValid::class);
 

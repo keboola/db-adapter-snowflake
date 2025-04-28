@@ -26,7 +26,7 @@ class ConnectionTest extends TestCase
         $this->assertSame('1', $res[0]['result']);
     }
 
-    public function testCanConnectWithKeyPair(): void
+    public function testCanConnectWithPrivateKey(): void
     {
         $connection = new Connection([
             'host' => getenv('SNOWFLAKE_HOST'),
