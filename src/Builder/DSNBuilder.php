@@ -24,7 +24,7 @@ class DSNBuilder
             'host',
             'user',
             'password',
-            'keyPair',
+            'privateKey',
             'port',
             'tracing',
             'loginTimeout',
@@ -93,18 +93,18 @@ class DSNBuilder
             $dsn .= ';Role=' . QueryBuilder::quoteIdentifier($options['roleName']);
         }
 
-        if (isset($options['keyPair'])) {
+        if (isset($options['privateKey'])) {
             $dsn .= ';AUTHENTICATOR=SNOWFLAKE_JWT';
-            $dsn .= ';PRIV_KEY_FILE=' . self::getKeyPairPath($options['keyPair']);
+            $dsn .= ';PRIV_KEY_FILE=' . self::getPrivateKeyPath($options['privateKey']);
             $dsn .= ';UID=' . $options['user'];
         }
 
         return $dsn;
     }
 
-    private static function getKeyPairPath(string $keyPair): string
+    private static function getPrivateKeyPath(string $privateKey): string
     {
-        $privateKeyResource = openssl_pkey_get_private($keyPair);
+        $privateKeyResource = openssl_pkey_get_private($privateKey);
         if (!$privateKeyResource) {
             throw new PrivateKeyIsNotValid();
         }
