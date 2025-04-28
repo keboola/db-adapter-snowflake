@@ -33,7 +33,7 @@ class ConnectionTest extends TestCase
             'user' => getenv('SNOWFLAKE_USER'),
             'password' => '',
             'database' => getenv('SNOWFLAKE_DATABASE'),
-            'keyPair' => getenv('SNOWFLAKE_KEYPAIR'),
+            'privateKey' => getenv('SNOWFLAKE_PRIVATEKEY'),
         ]);
 
         $res = $connection->fetchAll('SELECT 1 AS "result"');
