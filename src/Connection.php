@@ -144,7 +144,19 @@ class Connection
     {
         try {
             $stmt = odbc_prepare($this->connection, $sql);
-            odbc_execute($stmt, $this->repairBinding($bind));
+            $result = @odbc_execute($stmt, $this->repairBinding($bind));
+            if ($result === false) {
+                $errorMessage = odbc_errormsg($this->connection);
+                $errorCode = odbc_error($this->connection);
+                odbc_free_result($stmt);
+                throw new Exception\RuntimeException(
+                    sprintf(
+                        'Error "%s" while executing query "%s"',
+                        $errorMessage ?: sprintf('ODBC execute failed with code %s', $errorCode ?: 'unknown'),
+                        $sql,
+                    ),
+                );
+            }
             odbc_free_result($stmt);
         } catch (Throwable $e) {
             (new ExceptionHandler())->handleException($e, $sql);
@@ -156,7 +168,19 @@ class Connection
         $rows = [];
         try {
             $stmt = odbc_prepare($this->connection, $sql);
-            odbc_execute($stmt, $this->repairBinding($bind));
+            $result = @odbc_execute($stmt, $this->repairBinding($bind));
+            if ($result === false) {
+                $errorMessage = odbc_errormsg($this->connection);
+                $errorCode = odbc_error($this->connection);
+                odbc_free_result($stmt);
+                throw new Exception\RuntimeException(
+                    sprintf(
+                        'Error "%s" while executing query "%s"',
+                        $errorMessage ?: sprintf('ODBC execute failed with code %s', $errorCode ?: 'unknown'),
+                        $sql,
+                    ),
+                );
+            }
             while ($row = odbc_fetch_array($stmt)) {
                 $rows[] = $row;
             }
@@ -171,7 +195,19 @@ class Connection
     {
         try {
             $stmt = odbc_prepare($this->connection, $sql);
-            odbc_execute($stmt, $this->repairBinding($bind));
+            $result = @odbc_execute($stmt, $this->repairBinding($bind));
+            if ($result === false) {
+                $errorMessage = odbc_errormsg($this->connection);
+                $errorCode = odbc_error($this->connection);
+                odbc_free_result($stmt);
+                throw new Exception\RuntimeException(
+                    sprintf(
+                        'Error "%s" while executing query "%s"',
+                        $errorMessage ?: sprintf('ODBC execute failed with code %s', $errorCode ?: 'unknown'),
+                        $sql,
+                    ),
+                );
+            }
             while ($row = odbc_fetch_array($stmt)) {
                 $callback($row);
             }
