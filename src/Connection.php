@@ -6,6 +6,7 @@ namespace Keboola\SnowflakeDbAdapter;
 
 use Keboola\SnowflakeDbAdapter\Builder\DSNBuilder;
 use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
+use RuntimeException;
 use Throwable;
 
 class Connection
@@ -149,7 +150,7 @@ class Connection
                 $errorMessage = odbc_errormsg($this->connection);
                 $errorCode = odbc_error($this->connection);
                 odbc_free_result($stmt);
-                throw new \RuntimeException(
+                throw new RuntimeException(
                     $errorMessage ?: sprintf('ODBC execute failed with code %s', $errorCode ?: 'unknown'),
                 );
             }
@@ -169,7 +170,7 @@ class Connection
                 $errorMessage = odbc_errormsg($this->connection);
                 $errorCode = odbc_error($this->connection);
                 odbc_free_result($stmt);
-                throw new \RuntimeException(
+                throw new RuntimeException(
                     $errorMessage ?: sprintf('ODBC execute failed with code %s', $errorCode ?: 'unknown'),
                 );
             }
@@ -192,7 +193,7 @@ class Connection
                 $errorMessage = odbc_errormsg($this->connection);
                 $errorCode = odbc_error($this->connection);
                 odbc_free_result($stmt);
-                throw new \RuntimeException(
+                throw new RuntimeException(
                     $errorMessage ?: sprintf('ODBC execute failed with code %s', $errorCode ?: 'unknown'),
                 );
             }
