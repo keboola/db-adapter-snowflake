@@ -145,7 +145,7 @@ class Connection
     {
         try {
             $stmt = odbc_prepare($this->connection, $sql);
-            $result = @odbc_execute($stmt, $this->repairBinding($bind));
+            $result = odbc_execute($stmt, $this->repairBinding($bind));
             if ($result === false) {
                 $errorMessage = odbc_errormsg($this->connection);
                 $errorCode = odbc_error($this->connection);
@@ -165,7 +165,7 @@ class Connection
         $rows = [];
         try {
             $stmt = odbc_prepare($this->connection, $sql);
-            $result = @odbc_execute($stmt, $this->repairBinding($bind));
+            $result = odbc_execute($stmt, $this->repairBinding($bind));
             if ($result === false) {
                 $errorMessage = odbc_errormsg($this->connection);
                 $errorCode = odbc_error($this->connection);
@@ -188,7 +188,7 @@ class Connection
     {
         try {
             $stmt = odbc_prepare($this->connection, $sql);
-            $result = @odbc_execute($stmt, $this->repairBinding($bind));
+            $result = odbc_execute($stmt, $this->repairBinding($bind));
             if ($result === false) {
                 $errorMessage = odbc_errormsg($this->connection);
                 $errorCode = odbc_error($this->connection);
