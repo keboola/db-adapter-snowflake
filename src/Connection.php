@@ -149,12 +149,8 @@ class Connection
                 $errorMessage = odbc_errormsg($this->connection);
                 $errorCode = odbc_error($this->connection);
                 odbc_free_result($stmt);
-                throw new Exception\RuntimeException(
-                    sprintf(
-                        'Error "%s" while executing query "%s"',
-                        $errorMessage ?: sprintf('ODBC execute failed with code %s', $errorCode ?: 'unknown'),
-                        $sql,
-                    ),
+                throw new \RuntimeException(
+                    $errorMessage ?: sprintf('ODBC execute failed with code %s', $errorCode ?: 'unknown'),
                 );
             }
             odbc_free_result($stmt);
@@ -173,12 +169,8 @@ class Connection
                 $errorMessage = odbc_errormsg($this->connection);
                 $errorCode = odbc_error($this->connection);
                 odbc_free_result($stmt);
-                throw new Exception\RuntimeException(
-                    sprintf(
-                        'Error "%s" while executing query "%s"',
-                        $errorMessage ?: sprintf('ODBC execute failed with code %s', $errorCode ?: 'unknown'),
-                        $sql,
-                    ),
+                throw new \RuntimeException(
+                    $errorMessage ?: sprintf('ODBC execute failed with code %s', $errorCode ?: 'unknown'),
                 );
             }
             while ($row = odbc_fetch_array($stmt)) {
@@ -200,12 +192,8 @@ class Connection
                 $errorMessage = odbc_errormsg($this->connection);
                 $errorCode = odbc_error($this->connection);
                 odbc_free_result($stmt);
-                throw new Exception\RuntimeException(
-                    sprintf(
-                        'Error "%s" while executing query "%s"',
-                        $errorMessage ?: sprintf('ODBC execute failed with code %s', $errorCode ?: 'unknown'),
-                        $sql,
-                    ),
+                throw new \RuntimeException(
+                    $errorMessage ?: sprintf('ODBC execute failed with code %s', $errorCode ?: 'unknown'),
                 );
             }
             while ($row = odbc_fetch_array($stmt)) {
