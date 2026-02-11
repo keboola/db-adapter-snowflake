@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Keboola\SnowflakeDbAdapter;
 
 use Keboola\SnowflakeDbAdapter\Builder\DSNBuilder;
+use Keboola\SnowflakeDbAdapter\Exception\RuntimeException;
 use Keboola\SnowflakeDbAdapter\Exception\SnowflakeDbAdapterException;
-use RuntimeException;
 use Throwable;
 
 class Connection
