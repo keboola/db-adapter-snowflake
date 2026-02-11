@@ -144,17 +144,10 @@ class Connection
     public function query(string $sql, array $bind = []): void
     {
         try {
-            $stmt = odbc_prepare($this->connection, $sql);
-            $result = odbc_execute($stmt, $this->repairBinding($bind));
-            if ($result === false) {
-                $errorMessage = odbc_errormsg($this->connection);
-                $errorCode = odbc_error($this->connection);
+            $stmt = $this->executeStatement($sql, $bind);
+            if (is_resource($stmt)) {
                 odbc_free_result($stmt);
-                throw new RuntimeException(
-                    $errorMessage ?: sprintf('ODBC execute failed with code %s', $errorCode ?: 'unknown'),
-                );
             }
-            odbc_free_result($stmt);
         } catch (Throwable $e) {
             (new ExceptionHandler())->handleException($e, $sql);
         }
@@ -164,16 +157,7 @@ class Connection
     {
         $rows = [];
         try {
-            $stmt = odbc_prepare($this->connection, $sql);
-            $result = odbc_execute($stmt, $this->repairBinding($bind));
-            if ($result === false) {
-                $errorMessage = odbc_errormsg($this->connection);
-                $errorCode = odbc_error($this->connection);
-                odbc_free_result($stmt);
-                throw new RuntimeException(
-                    $errorMessage ?: sprintf('ODBC execute failed with code %s', $errorCode ?: 'unknown'),
-                );
-            }
+            $stmt = $this->executeStatement($sql, $bind);
             while ($row = odbc_fetch_array($stmt)) {
                 $rows[] = $row;
             }
@@ -187,16 +171,7 @@ class Connection
     public function fetch(string $sql, array $bind, callable $callback): void
     {
         try {
-            $stmt = odbc_prepare($this->connection, $sql);
-            $result = odbc_execute($stmt, $this->repairBinding($bind));
-            if ($result === false) {
-                $errorMessage = odbc_errormsg($this->connection);
-                $errorCode = odbc_error($this->connection);
-                odbc_free_result($stmt);
-                throw new RuntimeException(
-                    $errorMessage ?: sprintf('ODBC execute failed with code %s', $errorCode ?: 'unknown'),
-                );
-            }
+            $stmt = $this->executeStatement($sql, $bind);
             while ($row = odbc_fetch_array($stmt)) {
                 $callback($row);
             }
@@ -204,6 +179,29 @@ class Connection
         } catch (Throwable $e) {
             (new ExceptionHandler())->handleException($e, $sql);
         }
+    }
+
+    /**
+     * @return resource
+     */
+    private function executeStatement(string $sql, array $bind = [])
+    {
+        $stmt = odbc_prepare($this->connection, $sql);
+        if (!is_resource($stmt)) {
+            throw new RuntimeException(
+                odbc_errormsg($this->connection) ?: 'ODBC prepare failed',
+            );
+        }
+        $result = odbc_execute($stmt, $this->repairBinding($bind));
+        if ($result === false) {
+            $errorMessage = odbc_errormsg($this->connection);
+            $errorCode = odbc_error($this->connection);
+            odbc_free_result($stmt);
+            throw new RuntimeException(
+                $errorMessage ?: sprintf('ODBC execute failed with code %s', $errorCode ?: 'unknown'),
+            );
+        }
+        return $stmt;
     }
 
     /**

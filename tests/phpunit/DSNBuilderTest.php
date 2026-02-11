@@ -76,7 +76,7 @@ FFdzKwQdMPWGCJTt0KdMw2s=
             . 'PRIV_KEY_FILE=\/tmp\/snowflake_private_key_([a-zA-Z0-9]*).p8;'
             . 'UID=user$/';
         self::assertTrue(
-            @preg_match($pattern, $dsn) === 1,
+            preg_match($pattern, $dsn) === 1,
         );
     }
 
