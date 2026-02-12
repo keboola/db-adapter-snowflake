@@ -145,9 +145,7 @@ class Connection
     {
         try {
             $stmt = $this->executeStatement($sql, $bind);
-            if (is_resource($stmt)) {
-                odbc_free_result($stmt);
-            }
+            odbc_free_result($stmt);
         } catch (Throwable $e) {
             (new ExceptionHandler())->handleException($e, $sql);
         }
@@ -187,7 +185,7 @@ class Connection
     private function executeStatement(string $sql, array $bind = [])
     {
         $stmt = odbc_prepare($this->connection, $sql);
-        if (!is_resource($stmt)) {
+        if ($stmt === false) {
             throw new RuntimeException(
                 odbc_errormsg($this->connection) ?: 'ODBC prepare failed',
             );
