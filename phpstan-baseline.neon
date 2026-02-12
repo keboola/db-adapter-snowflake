@@ -56,18 +56,8 @@ parameters:
 			path: src/Connection.php
 
 		-
-			message: "#^Parameter \\#1 \\$statement of function odbc_execute expects resource, resource\\|false given\\.$#"
-			count: 3
-			path: src/Connection.php
-
-		-
-			message: "#^Parameter \\#1 \\$statement of function odbc_fetch_array expects resource, resource\\|false given\\.$#"
-			count: 2
-			path: src/Connection.php
-
-		-
-			message: "#^Parameter \\#1 \\$statement of function odbc_free_result expects resource, resource\\|false given\\.$#"
-			count: 3
+			message: "#^Method Keboola\\\\SnowflakeDbAdapter\\\\Connection\\:\\:executeStatement\\(\\) has parameter \\$bind with no value type specified in iterable type array\\.$#"
+			count: 1
 			path: src/Connection.php
 
 		-
