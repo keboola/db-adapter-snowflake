@@ -61,12 +61,7 @@ parameters:
 			path: src/Connection.php
 
 		-
-			message: "#^Property Keboola\\\\SnowflakeDbAdapter\\\\Connection\\:\\:\\$connection \\(resource\\|null\\) does not accept resource\\|false\\.$#"
-			count: 1
-			path: src/Connection.php
-
-		-
-			message: "#^Parameter \\#1 \\$odbc of function odbc_prepare expects resource, resource\\|null given\\.$#"
+			message: "#^Property Keboola\\\\SnowflakeDbAdapter\\\\Connection\\:\\:\\$connection \\(resource\\) does not accept resource\\|false\\.$#"
 			count: 1
 			path: src/Connection.php
 
