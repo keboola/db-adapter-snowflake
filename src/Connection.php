@@ -12,7 +12,7 @@ use Throwable;
 class Connection
 {
     /**
-     * @var resource odbc handle
+     * @var resource|null odbc handle
      */
     private $connection;
 
@@ -220,6 +220,7 @@ class Connection
     {
         if ($this->connection !== null) {
             odbc_close($this->connection);
+            $this->connection = null;
         }
     }
 }
