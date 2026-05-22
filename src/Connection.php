@@ -23,7 +23,7 @@ class Connection
      * - host (string, required) - hostname
      * - port (int, optional) - port - default 443
      * - user (string, required) - username
-     * - password (string, required) - password
+     * - privateKey (string, required) - PEM-encoded RSA private key for key-pair (JWT) authentication
      * - warehouse (string) - default warehouse to use
      * - database (string) - default database to use
      * - tracing (int) - the level of detail to be logged in the driver trace files
@@ -52,7 +52,7 @@ class Connection
                 sleep(pow(2, $attemptNumber));
             }
             try {
-                $this->connection = odbc_connect($dsn, $options['user'], $options['password']);
+                $this->connection = odbc_connect($dsn, $options['user'], '');
 
                 if (isset($options['runId'])) {
                     $queryTag = [

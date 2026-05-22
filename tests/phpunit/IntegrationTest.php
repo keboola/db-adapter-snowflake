@@ -22,7 +22,7 @@ class IntegrationTest extends TestCase
         $this->connection = new Connection([
             'host' => getenv('SNOWFLAKE_HOST'),
             'user' => getenv('SNOWFLAKE_USER'),
-            'password' => getenv('SNOWFLAKE_PASSWORD'),
+            'privateKey' => getenv('SNOWFLAKE_PRIVATEKEY'),
             'database' => getenv('SNOWFLAKE_DATABASE'),
             'warehouse' => getenv('SNOWFLAKE_WAREHOUSE'),
         ]);
@@ -211,7 +211,7 @@ class IntegrationTest extends TestCase
         $connection = new Connection([
             'host' => getenv('SNOWFLAKE_HOST'),
             'user' => getenv('SNOWFLAKE_USER'),
-            'password' => getenv('SNOWFLAKE_PASSWORD'),
+            'privateKey' => getenv('SNOWFLAKE_PRIVATEKEY'),
             'database' => getenv('SNOWFLAKE_DATABASE'),
             'schema' => $this->sourceSchemaName,
             'warehouse' => getenv('SNOWFLAKE_WAREHOUSE'),

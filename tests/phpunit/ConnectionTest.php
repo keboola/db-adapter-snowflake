@@ -13,25 +13,11 @@ use ReflectionClass;
 
 class ConnectionTest extends TestCase
 {
-    public function testCanConnect(): void
-    {
-        $connection = new Connection([
-            'host' => getenv('SNOWFLAKE_HOST'),
-            'user' => getenv('SNOWFLAKE_USER'),
-            'password' => getenv('SNOWFLAKE_PASSWORD'),
-            'database' => getenv('SNOWFLAKE_DATABASE'),
-        ]);
-        $this->assertInstanceOf(Connection::class, $connection);
-        $res = $connection->fetchAll('SELECT 1 AS "result"');
-        $this->assertSame('1', $res[0]['result']);
-    }
-
     public function testCanConnectWithPrivateKey(): void
     {
         $connection = new Connection([
             'host' => getenv('SNOWFLAKE_HOST'),
             'user' => getenv('SNOWFLAKE_USER'),
-            'password' => '',
             'database' => getenv('SNOWFLAKE_DATABASE'),
             'privateKey' => getenv('SNOWFLAKE_PRIVATEKEY'),
         ]);
@@ -46,7 +32,7 @@ class ConnectionTest extends TestCase
         $config = [
             'host' => getenv('SNOWFLAKE_HOST'),
             'user' => getenv('SNOWFLAKE_USER'),
-            'password' => getenv('SNOWFLAKE_PASSWORD'),
+            'privateKey' => getenv('SNOWFLAKE_PRIVATEKEY'),
             'database' => $invalidDatabase,
         ];
         $connection = new Connection($config);
@@ -67,7 +53,7 @@ class ConnectionTest extends TestCase
         $config = [
             'host' => getenv('SNOWFLAKE_HOST'),
             'user' => getenv('SNOWFLAKE_USER'),
-            'password' => getenv('SNOWFLAKE_PASSWORD'),
+            'privateKey' => getenv('SNOWFLAKE_PRIVATEKEY'),
             'database' => getenv('SNOWFLAKE_DATABASE'),
             'schema' => $invalidSchema,
         ];
@@ -90,7 +76,7 @@ class ConnectionTest extends TestCase
         new Connection([
             'host' => getenv('SNOWFLAKE_HOST'),
             'user' => getenv('SNOWFLAKE_USER'),
-            'password' => getenv('SNOWFLAKE_PASSWORD'),
+            'privateKey' => getenv('SNOWFLAKE_PRIVATEKEY'),
             'someRandomParameter' => false,
             'otherRandomParameter' => false,
             'value',
@@ -104,7 +90,7 @@ class ConnectionTest extends TestCase
 
         new Connection([
             'host' => getenv('SNOWFLAKE_HOST'),
-            'password' => getenv('SNOWFLAKE_PASSWORD'),
+            'privateKey' => getenv('SNOWFLAKE_PRIVATEKEY'),
         ]);
     }
 
@@ -113,7 +99,7 @@ class ConnectionTest extends TestCase
         $connection = new Connection([
             'host' => getenv('SNOWFLAKE_HOST'),
             'user' => getenv('SNOWFLAKE_USER'),
-            'password' => getenv('SNOWFLAKE_PASSWORD'),
+            'privateKey' => getenv('SNOWFLAKE_PRIVATEKEY'),
         ]);
         $reflection = new ReflectionClass($connection);
         $connectionProperty = $reflection->getProperty('connection');
@@ -130,7 +116,7 @@ class ConnectionTest extends TestCase
         $connection = new Connection([
             'host' => getenv('SNOWFLAKE_HOST'),
             'user' => getenv('SNOWFLAKE_USER'),
-            'password' => getenv('SNOWFLAKE_PASSWORD'),
+            'privateKey' => getenv('SNOWFLAKE_PRIVATEKEY'),
             'database' => getenv('SNOWFLAKE_DATABASE'),
             'warehouse' => getenv('SNOWFLAKE_WAREHOUSE'),
             'runId' => 'runIdValue',
@@ -139,12 +125,12 @@ class ConnectionTest extends TestCase
         $connection->fetchAll('SELECT current_date;');
         $queries = $connection->fetchAll(
             '
-                SELECT 
-                    QUERY_TEXT, QUERY_TAG 
-                FROM 
+                SELECT
+                    QUERY_TEXT, QUERY_TAG
+                FROM
                     TABLE(INFORMATION_SCHEMA.QUERY_HISTORY_BY_SESSION())
-                WHERE QUERY_TEXT = \'SELECT current_date;\' 
-                ORDER BY START_TIME DESC 
+                WHERE QUERY_TEXT = \'SELECT current_date;\'
+                ORDER BY START_TIME DESC
                 LIMIT 1
             ',
         );
