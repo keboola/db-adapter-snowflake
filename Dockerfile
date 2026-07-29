@@ -60,7 +60,8 @@ RUN mkdir -p ~/.gnupg \
     && mkdir -p /etc/gnupg \
     && echo "allow-weak-digest-algos" >> /etc/gnupg/gpg.conf \
     && mkdir /usr/share/debsig/keyrings/$SNOWFLAKE_GPG_KEY \
-    && gpg --keyserver hkp://keyserver.ubuntu.com --keyserver-options timeout=30 --recv-keys $SNOWFLAKE_GPG_KEY \
+    && gpg --keyserver hkps://keyserver.ubuntu.com --keyserver-options timeout=30 --recv-keys $SNOWFLAKE_GPG_KEY \
+    && gpg --fingerprint --with-colons $SNOWFLAKE_GPG_KEY | grep -q "^fpr:::::::::$SNOWFLAKE_GPG_KEY:" \
     && gpg --export $SNOWFLAKE_GPG_KEY > /usr/share/debsig/keyrings/$SNOWFLAKE_GPG_KEY/debsig.gpg \
     && curl https://sfc-repo.snowflakecomputing.com/odbc/linux/$SNOWFLAKE_ODBC_VERSION/snowflake-odbc-$SNOWFLAKE_ODBC_VERSION.x86_64.deb --output /tmp/snowflake-odbc.deb \
     && debsig-verify /tmp/snowflake-odbc.deb \
