@@ -18,12 +18,12 @@ class DSNBuilder
         $requiredOptions = [
             'host',
             'user',
+            'privateKey',
         ];
 
         $allowedOptions = [
             'host',
             'user',
-            'password',
             'privateKey',
             'port',
             'tracing',
@@ -93,11 +93,9 @@ class DSNBuilder
             $dsn .= ';Role=' . QueryBuilder::quoteIdentifier($options['roleName']);
         }
 
-        if (isset($options['privateKey'])) {
-            $dsn .= ';AUTHENTICATOR=SNOWFLAKE_JWT';
-            $dsn .= ';PRIV_KEY_FILE=' . self::getPrivateKeyPath($options['privateKey']);
-            $dsn .= ';UID=' . $options['user'];
-        }
+        $dsn .= ';AUTHENTICATOR=SNOWFLAKE_JWT';
+        $dsn .= ';PRIV_KEY_FILE=' . self::getPrivateKeyPath($options['privateKey']);
+        $dsn .= ';UID=' . $options['user'];
 
         return $dsn;
     }

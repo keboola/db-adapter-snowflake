@@ -47,13 +47,17 @@ FFdzKwQdMPWGCJTt0KdMw2s=
             'database' => 'db',
             'warehouse' => 'whh',
             'user' => 'user',
-            'password' => 'password',
+            'privateKey' => self::PRIVATE_KEY,
             'roleName' => 'role',
         ]);
 
-        self::assertEquals(
-            'Driver=SnowflakeDSIIDriver;Server=host;Port=443;Tracing=0;Database="db";Warehouse="whh";Role="role"',
-            $dsn,
+        $pattern = '/^Driver=SnowflakeDSIIDriver;Server=host;Port=443;Tracing=0;'
+            . 'Database="db";Warehouse="whh";Role="role";'
+            . 'AUTHENTICATOR=SNOWFLAKE_JWT;'
+            . 'PRIV_KEY_FILE=\/tmp\/snowflake_private_key_([a-zA-Z0-9]*).p8;'
+            . 'UID=user$/';
+        self::assertTrue(
+            preg_match($pattern, $dsn) === 1,
         );
     }
 
@@ -65,7 +69,6 @@ FFdzKwQdMPWGCJTt0KdMw2s=
             'database' => 'database',
             'warehouse' => 'warehouse',
             'user' => 'user',
-            'password' => 'password',
             'roleName' => 'role',
             'privateKey' => self::PRIVATE_KEY,
         ]);
@@ -90,7 +93,6 @@ FFdzKwQdMPWGCJTt0KdMw2s=
             'database' => 'database',
             'warehouse' => 'warehouse',
             'user' => 'user',
-            'password' => 'password',
             'roleName' => 'role',
             'privateKey' => 'totally bad key pair',
         ]);

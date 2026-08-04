@@ -81,7 +81,7 @@ class QueryBuilderIntegrationTest extends TestCase
                 'host' => $this->getEnv('SNOWFLAKE_HOST'),
                 'database' => $this->getEnv('SNOWFLAKE_DATABASE'),
                 'user' => $this->getEnv('SNOWFLAKE_USER'),
-                'password' => $this->getEnv('SNOWFLAKE_PASSWORD'),
+                'privateKey' => $this->getEnv('SNOWFLAKE_PRIVATEKEY'),
                 'warehouse' => $this->getEnv('SNOWFLAKE_WAREHOUSE'),
             ]);
         }
